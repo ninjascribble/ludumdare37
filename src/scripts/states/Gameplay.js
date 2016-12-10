@@ -11,6 +11,7 @@ export default class Gameplay extends _State {
 
     this.add.existing(this.titleText());
     this.add.existing(this.player);
+    this.add.existing(this.enemies);
 
     this.enemies.spawnAlien(64, 64);
     this.enemies.spawnAlien(64, this.world.height / 2);

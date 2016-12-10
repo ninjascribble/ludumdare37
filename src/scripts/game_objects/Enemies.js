@@ -1,6 +1,6 @@
 export default class Enemies extends Phaser.Group {
-  constructor (game, parent, name, addToStage = true) {
-    super(game, parent, name, addToStage)
+  constructor (game, parent, name) {
+    super(game, parent, name)
   }
 
   setAlienBuilder (builder) {

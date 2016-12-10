@@ -169,6 +169,7 @@
 	
 	      this.add.existing(this.titleText());
 	      this.add.existing(this.player);
+	      this.add.existing(this.enemies);
 	
 	      this.enemies.spawnAlien(64, 64);
 	      this.enemies.spawnAlien(64, this.world.height / 2);
@@ -411,11 +412,9 @@
 	  _inherits(Enemies, _Phaser$Group);
 	
 	  function Enemies(game, parent, name) {
-	    var addToStage = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
-	
 	    _classCallCheck(this, Enemies);
 	
-	    return _possibleConstructorReturn(this, (Enemies.__proto__ || Object.getPrototypeOf(Enemies)).call(this, game, parent, name, addToStage));
+	    return _possibleConstructorReturn(this, (Enemies.__proto__ || Object.getPrototypeOf(Enemies)).call(this, game, parent, name));
 	  }
 	
 	  _createClass(Enemies, [{
