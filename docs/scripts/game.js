@@ -955,8 +955,8 @@
 	    // this.body.immovable = true;
 	    var _this = _possibleConstructorReturn(this, (Book.__proto__ || Object.getPrototypeOf(Book)).call(this, game, x, y, key));
 	
-	    _this.animations.add('open', [0, 1, 2, 3], 6, false);
-	    _this.animations.add('close', [4, 5, 6, 7], 6, false);
+	    _this.animations.add('open', [0, 1, 2, 3], 12, false);
+	    _this.animations.add('close', [4, 5, 6, 7], 12, false);
 	    return _this;
 	  }
 	
