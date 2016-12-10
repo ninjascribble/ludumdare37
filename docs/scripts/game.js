@@ -176,29 +176,17 @@
 	      this.world.setBounds(0, 0, this.world.width, this.world.height);
 	      this.player = _game_objects2.default.player(game, this.world.centerX, 60);
 	
-	      this.bricks = _game_objects2.default.bricks(game);
-	      this.book = _game_objects2.default.book(game, this.world.centerX, 90);
-	      this.brick = _game_objects2.default.brick(game, this.world.centerX, 90);
+	      this.room = _game_objects2.default.room(game);
+	      this.book = _game_objects2.default.book(game, 160, 144);
 	      this.solarMeter = _game_objects2.default.solarMeter(game);
 	      this.enemies = _game_objects2.default.enemies(game);
 	      this.enemies.setSpawnPoints([{ x: -16, y: -16 }, { x: -16, y: this.world.centerY }, { x: -16, y: this.world.height + 16 }, { x: this.world.width + 16, y: -16 }, { x: this.world.width + 16, y: this.world.centerY }, { x: this.world.width + 16, y: this.world.height + 16 }, { x: -16, y: -16 }, { x: this.world.centerX, y: -16 }, { x: this.world.with + 16, y: -16 }, { x: -16, y: this.world.height + 16 }, { x: this.world.centerX, y: this.world.height + 16 }, { x: this.world.with + 16, y: this.world.height + 16 }]);
 	
-	      this.add.existing(this.bricks);
-	      this.add.existing(this.brick);
+	      this.add.existing(this.room);
 	      this.add.existing(this.book);
 	      this.add.existing(this.player);
 	      this.add.existing(this.enemies);
 	      this.add.existing(this.solarMeter);
-	
-	      this.bricks.addBrick(144, 128);
-	      this.bricks.addBrick(160, 128);
-	      this.bricks.addBrick(176, 128);
-	      this.bricks.addBrick(144, 144);
-	      this.bricks.addBrick(160, 144);
-	      this.bricks.addBrick(176, 144);
-	      this.bricks.addBrick(144, 160);
-	      this.bricks.addBrick(160, 160);
-	      this.bricks.addBrick(176, 160);
 	
 	      this.enemies.startMoveTimer();
 	      this.enemies.startSpawnTimer();
@@ -216,8 +204,9 @@
 	    key: 'update',
 	    value: function update() {
 	      this.game.physics.arcade.overlap(this.player, this.enemies, this.onPlayerEnemyCollide);
+	      this.game.physics.arcade.collide(this.player, this.book);
 	      this.game.physics.arcade.collide(this.enemies, this.enemies);
-	      this.game.physics.arcade.collide(this.brick, this.enemies);
+	      this.game.physics.arcade.collide(this.room, this.enemies);
 	
 	      if (this.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
 	        this.player.moveLeft();
@@ -235,7 +224,7 @@
 	        this.player.moveDown();
 	      }
 	
-	      if (this.player.overlap(this.brick)) {
+	      if (this.player.overlap(this.room)) {
 	        this.solarMeter.charging();
 	      } else {
 	        this.solarMeter.draining();
@@ -320,9 +309,9 @@
 	
 	var _BrickSprite2 = _interopRequireDefault(_BrickSprite);
 	
-	var _Bricks = __webpack_require__(12);
+	var _Room = __webpack_require__(12);
 	
-	var _Bricks2 = _interopRequireDefault(_Bricks);
+	var _Room2 = _interopRequireDefault(_Room);
 	
 	var _Book = __webpack_require__(13);
 	
@@ -337,7 +326,7 @@
 	var SOLAR_METER = 'solar_meter';
 	var ALIEN = 'alien';
 	var BRICK = 'brick';
-	var BRICKS = 'bricks';
+	var ROOM = 'room';
 	var BOOK = 'book';
 	
 	module.exports = {
@@ -352,18 +341,16 @@
 	    return new _Player2.default(game, x, y, PLAYER);
 	  },
 	
-	  bricks: function bricks(game, parent) {
-	    var group = new _Bricks2.default(game, parent, BRICKS);
+	  room: function room(game, parent) {
+	    var group = new _Room2.default(game, parent, ROOM);
 	    group.setBrickBuilder(module.exports.brick);
-	
+	    group.buildAll();
 	    return group;
 	  },
 	
 	  enemies: function enemies(game, parent) {
 	    var group = new _Enemies2.default(game, parent, ENEMIES);
-	
 	    group.setAlienBuilder(module.exports.alien);
-	
 	    return group;
 	  },
 	
@@ -971,42 +958,45 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var Bricksprite = function (_Phaser$Group) {
-	  _inherits(Bricksprite, _Phaser$Group);
+	var Room = function (_Phaser$Group) {
+	  _inherits(Room, _Phaser$Group);
 	
-	  function Bricksprite(game, parent, name) {
-	    _classCallCheck(this, Bricksprite);
+	  function Room(game, parent, name) {
+	    _classCallCheck(this, Room);
 	
-	    return _possibleConstructorReturn(this, (Bricksprite.__proto__ || Object.getPrototypeOf(Bricksprite)).call(this, game, parent, name));
+	    return _possibleConstructorReturn(this, (Room.__proto__ || Object.getPrototypeOf(Room)).call(this, game, parent, name));
 	  }
 	
-	  _createClass(Bricksprite, [{
+	  _createClass(Room, [{
 	    key: "setBrickBuilder",
 	    value: function setBrickBuilder(builder) {
 	      this.brickBuilder = builder;
 	    }
 	  }, {
+	    key: "buildAll",
+	    value: function buildAll() {
+	      this.addBrick(144, 128);
+	      this.addBrick(160, 128);
+	      this.addBrick(176, 128);
+	      this.addBrick(144, 144);
+	      this.addBrick(160, 144);
+	      this.addBrick(176, 144);
+	      this.addBrick(144, 160);
+	      this.addBrick(160, 160);
+	      this.addBrick(176, 160);
+	    }
+	  }, {
 	    key: "addBrick",
 	    value: function addBrick(x, y) {
 	      var brick = this.brickBuilder(game, x, y);
-	
 	      this.add(brick);
 	    }
-	    /*onCollide(){
-	      super.onCollide();
-	      if(!this.body.immovable){
-	      // this.game.sound.play('brickImpact');
-	      }
-	       this.body.immovable = true;
-	      this.onDone.dispatch();
-	    }*/
-	
 	  }]);
 	
-	  return Bricksprite;
+	  return Room;
 	}(Phaser.Group);
 	
-	exports.default = Bricksprite;
+	exports.default = Room;
 
 /***/ },
 /* 13 */
@@ -1032,10 +1022,11 @@
 	  function Book(game, x, y, key) {
 	    _classCallCheck(this, Book);
 	
-	    // game.physics.enable(this);
-	    // this.body.immovable = true;
 	    var _this = _possibleConstructorReturn(this, (Book.__proto__ || Object.getPrototypeOf(Book)).call(this, game, x, y, key));
 	
+	    game.physics.enable(_this);
+	    _this.body.immovable = true;
+	    _this.body.height = 2;
 	    _this.animations.add('open', [0, 1, 2, 3], 12, false);
 	    _this.animations.add('close', [4, 5, 6, 7], 12, false);
 	    return _this;

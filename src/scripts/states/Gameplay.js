@@ -8,9 +8,8 @@ export default class Gameplay extends _State {
     this.world.setBounds(0, 0, this.world.width, this.world.height);
     this.player = GameObjects.player(game, this.world.centerX, 60);
 
-    this.bricks = GameObjects.bricks(game);
-    this.book = GameObjects.book(game, this.world.centerX, 90);
-    this.brick = GameObjects.brick(game, this.world.centerX, 90);
+    this.room = GameObjects.room(game);
+    this.book = GameObjects.book(game, 160, 144);
     this.solarMeter = GameObjects.solarMeter(game);
     this.enemies = GameObjects.enemies(game);
     this.enemies.setSpawnPoints([
@@ -28,24 +27,11 @@ export default class Gameplay extends _State {
       { x: this.world.with + 16, y: this.world.height + 16 }
     ]);
 
-
-    this.add.existing(this.bricks);
-    this.add.existing(this.brick);
+    this.add.existing(this.room);
     this.add.existing(this.book);
     this.add.existing(this.player);
     this.add.existing(this.enemies);
     this.add.existing(this.solarMeter);
-
-    this.bricks.addBrick(144, 128);
-    this.bricks.addBrick(160, 128);
-    this.bricks.addBrick(176, 128);
-    this.bricks.addBrick(144, 144);
-    this.bricks.addBrick(160, 144);
-    this.bricks.addBrick(176, 144);
-    this.bricks.addBrick(144, 160);
-    this.bricks.addBrick(160, 160);
-    this.bricks.addBrick(176, 160);
-
 
     this.enemies.startMoveTimer();
     this.enemies.startSpawnTimer();
@@ -62,8 +48,9 @@ export default class Gameplay extends _State {
 
   update () {
     this.game.physics.arcade.overlap(this.player, this.enemies, this.onPlayerEnemyCollide);
+    this.game.physics.arcade.collide(this.player, this.book);
     this.game.physics.arcade.collide(this.enemies, this.enemies);
-    this.game.physics.arcade.collide(this.brick, this.enemies);
+    this.game.physics.arcade.collide(this.room, this.enemies);
 
     if (this.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
       this.player.moveLeft();
@@ -81,7 +68,7 @@ export default class Gameplay extends _State {
       this.player.moveDown();
     }
 
-    if (this.player.overlap(this.brick)) {
+    if (this.player.overlap(this.room)) {
       this.solarMeter.charging();
     } else {
       this.solarMeter.draining();

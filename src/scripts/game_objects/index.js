@@ -4,7 +4,7 @@ import Alien from './Alien';
 import SolarMeter from './SolarMeter';
 import BrickSprite from './BrickSprite'; //importing the bricksprite class
 
-import Bricks from './Bricks';
+import Room from './Room';
 import Book from './Book';
 
 const PLAYER = 'player';
@@ -12,7 +12,7 @@ const ENEMIES = 'enemies';
 const SOLAR_METER = 'solar_meter';
 const ALIEN = 'alien';
 const BRICK = 'brick';
-const BRICKS = 'bricks';
+const ROOM = 'room';
 const BOOK = 'book';
 
 module.exports = {
@@ -27,18 +27,16 @@ module.exports = {
     return new Player(game, x, y, PLAYER);
   },
 
-  bricks: function bricks(game, parent){
-    const group = new Bricks(game, parent, BRICKS);
+  room: function room(game, parent){
+    const group = new Room(game, parent, ROOM);
     group.setBrickBuilder(module.exports.brick);
-
+    group.buildAll();
     return group;
   },
 
   enemies: function enemies (game, parent) {
     const group = new Enemies(game, parent, ENEMIES);
-
     group.setAlienBuilder(module.exports.alien)
-
     return group;
   },
 
