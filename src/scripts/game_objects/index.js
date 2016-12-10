@@ -1,13 +1,13 @@
-import Ship from './Ship';
+import Player from './Player';
 
-const PLAYER_SHIP = 'ship';
+const PLAYER = 'player';
 
 module.exports = {
   load: function load (loader) {
-    loader.load.spritesheet(PLAYER_SHIP, 'assets/ship.png', 6, 6);
+    loader.load.spritesheet(PLAYER, 'assets/player.png', 16, 16);
   },
 
   player: function player (game, x, y) {
-    return new Ship(game, x, y, PLAYER_SHIP);
+    return new Player(game, x, y, PLAYER);
   }
 };

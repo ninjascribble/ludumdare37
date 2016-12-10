@@ -178,20 +178,20 @@
 	  }, {
 	    key: 'update',
 	    value: function update() {
-	      if (this.input.keyboard.isDown(Phaser.Keyboard.A)) {
-	        this.player.respawn(game.world.centerX, this.player.y);
-	      }
-	
-	      if (this.input.keyboard.isDown(Phaser.Keyboard.O)) {
-	        this.player.destroy();
-	      }
-	
 	      if (this.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
-	        this.player.bankLeft();
-	      } else if (this.input.keyboard.isDown(Phaser.Keyboard.RIGHT)) {
-	        this.player.bankRight();
-	      } else {
-	        this.player.normal();
+	        this.player.moveLeft();
+	      }
+	
+	      if (this.input.keyboard.isDown(Phaser.Keyboard.RIGHT)) {
+	        this.player.moveRight();
+	      }
+	
+	      if (this.input.keyboard.isDown(Phaser.Keyboard.UP)) {
+	        this.player.moveUp();
+	      }
+	
+	      if (this.input.keyboard.isDown(Phaser.Keyboard.DOWN)) {
+	        this.player.moveDown();
 	      }
 	    }
 	  }]);
@@ -240,21 +240,21 @@
 
 	'use strict';
 	
-	var _Ship = __webpack_require__(5);
+	var _Player = __webpack_require__(5);
 	
-	var _Ship2 = _interopRequireDefault(_Ship);
+	var _Player2 = _interopRequireDefault(_Player);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var PLAYER_SHIP = 'ship';
+	var PLAYER = 'player';
 	
 	module.exports = {
 	  load: function load(loader) {
-	    loader.load.spritesheet(PLAYER_SHIP, 'assets/ship.png', 6, 6);
+	    loader.load.spritesheet(PLAYER, 'assets/player.png', 16, 16);
 	  },
 	
 	  player: function player(game, x, y) {
-	    return new _Ship2.default(game, x, y, PLAYER_SHIP);
+	    return new _Player2.default(game, x, y, PLAYER);
 	  }
 	};
 
@@ -276,78 +276,82 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var Ship = function (_Phaser$Sprite) {
-	  _inherits(Ship, _Phaser$Sprite);
+	var MOVE_DURATION = 100;
+	var UP = 'up';
+	var DOWN = 'down';
+	var LEFT = 'left';
+	var RIGHT = 'right';
 	
-	  function Ship(game, x, y, key) {
-	    _classCallCheck(this, Ship);
+	var TrumpSprite = function (_Phaser$Sprite) {
+	  _inherits(TrumpSprite, _Phaser$Sprite);
 	
-	    var _this = _possibleConstructorReturn(this, (Ship.__proto__ || Object.getPrototypeOf(Ship)).call(this, game, x, y, key));
+	  function TrumpSprite(game, x, y, key) {
+	    _classCallCheck(this, TrumpSprite);
 	
-	    _this.animations.add('normal', [0, 1, 2], 20, true);
-	    _this.animations.add('bank', [3, 4, 5], 20, true);
-	    _this.animations.add('explode', [6, 7, 8], 12, false);
-	    _this.anchor.setTo(0.5, 1);
+	    var _this = _possibleConstructorReturn(this, (TrumpSprite.__proto__ || Object.getPrototypeOf(TrumpSprite)).call(this, game, x, y, key));
 	
 	    game.physics.enable(_this);
-	    _this.body.drag.x = 300;
-	    _this.body.maxVelocity = new Phaser.Point(120, 120);
-	    _this.normal();
+	
+	    _this.body.mass = 0;
+	    _this.body.onCollide = new Phaser.Signal();
+	
+	    _this.animations.add('walkDown', [0, 1, 0, 2], 6, true);
+	    _this.animations.add('walkUp', [3, 4, 3, 5], 6, true);
+	    _this.animations.add('walkRight', [6, 7, 6, 8], 6, true);
+	    _this.animations.add('walkLeft', [9, 10, 9, 11], 6, true);
 	    return _this;
 	  }
 	
-	  _createClass(Ship, [{
-	    key: 'respawn',
-	    value: function respawn() {
-	      var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-	      var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+	  _createClass(TrumpSprite, [{
+	    key: 'move',
+	    value: function move(x, y, facing, animation) {
+	      if (animation) {
+	        this.animations.play(animation);
+	      }
 	
-	      this.health = 100;
-	      this.alive = true;
-	      this.x = x;
-	      this.y = y;
-	      this.body.velocity.x = 0;
-	      this.revive();
-	      this.normal();
-	    }
-	  }, {
-	    key: 'destroy',
-	    value: function destroy() {
-	      this.health = 0;
-	      this.animations.play('explode', null, null, true);
-	    }
-	  }, {
-	    key: 'normal',
-	    value: function normal() {
-	      if (this.health > 0) {
-	        this.animations.play('normal');
-	        this.scale.x = 1;
+	      this.facing = facing;
+	
+	      switch (this.facing) {
+	        case LEFT:
+	          this.body.moveTo(MOVE_DURATION, 16, 180);
+	          break;
+	        case RIGHT:
+	          this.body.moveTo(MOVE_DURATION, 16, 0);
+	          break;
+	        case UP:
+	          this.body.moveTo(MOVE_DURATION, 16, 270);
+	          break;
+	        case DOWN:
+	          this.body.moveTo(MOVE_DURATION, 16, 90);
+	          break;
 	      }
 	    }
 	  }, {
-	    key: 'bankLeft',
-	    value: function bankLeft() {
-	      if (this.health > 0) {
-	        this.animations.play('bank');
-	        this.body.velocity.x = -this.body.maxVelocity.x;
-	        this.scale.x = 1;
-	      }
+	    key: 'moveLeft',
+	    value: function moveLeft() {
+	      this.move(-16, 0, LEFT, 'walkLeft');
 	    }
 	  }, {
-	    key: 'bankRight',
-	    value: function bankRight() {
-	      if (this.health > 0) {
-	        this.animations.play('bank');
-	        this.body.velocity.x = this.body.maxVelocity.x;
-	        this.scale.x = -1;
-	      }
+	    key: 'moveRight',
+	    value: function moveRight() {
+	      this.move(16, 0, RIGHT, 'walkRight');
+	    }
+	  }, {
+	    key: 'moveUp',
+	    value: function moveUp() {
+	      this.move(0, -16, UP, 'walkUp');
+	    }
+	  }, {
+	    key: 'moveDown',
+	    value: function moveDown() {
+	      this.move(0, 16, DOWN, 'walkDown');
 	    }
 	  }]);
 	
-	  return Ship;
+	  return TrumpSprite;
 	}(Phaser.Sprite);
 	
-	exports.default = Ship;
+	exports.default = TrumpSprite;
 
 /***/ },
 /* 6 */
@@ -523,7 +527,8 @@
 	  }, {
 	    key: 'create',
 	    value: function create() {
-	      this.stateProvider.menu(this.state);
+	      // this.stateProvider.menu(this.state);
+	      this.stateProvider.gameplay(this.state);
 	    }
 	  }]);
 	

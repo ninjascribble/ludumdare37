@@ -18,20 +18,20 @@ export default class Gameplay extends _State {
   }
 
   update () {
-    if (this.input.keyboard.isDown(Phaser.Keyboard.A)) {
-      this.player.respawn(game.world.centerX, this.player.y);
-    }
-
-    if (this.input.keyboard.isDown(Phaser.Keyboard.O)) {
-      this.player.destroy();
-    }
-
     if (this.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
-      this.player.bankLeft();
-    } else if (this.input.keyboard.isDown(Phaser.Keyboard.RIGHT)) {
-      this.player.bankRight();
-    } else {
-      this.player.normal();
+      this.player.moveLeft();
+    }
+
+    if (this.input.keyboard.isDown(Phaser.Keyboard.RIGHT)) {
+      this.player.moveRight();
+    }
+
+    if (this.input.keyboard.isDown(Phaser.Keyboard.UP)) {
+      this.player.moveUp();
+    }
+
+    if (this.input.keyboard.isDown(Phaser.Keyboard.DOWN)) {
+      this.player.moveDown();
     }
   }
 }
