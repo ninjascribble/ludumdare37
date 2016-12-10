@@ -10,7 +10,9 @@ export default class Alien extends Phaser.Sprite {
 
     game.physics.enable(this);
 
-    this.body.mass = 0;
+    this.body.drag.x = 1000;
+    this.body.drag.y = 1000;
+
     this.body.onCollide = new Phaser.Signal();
     this.body.collideWorldBounds = true;
 
@@ -18,6 +20,13 @@ export default class Alien extends Phaser.Sprite {
     this.animations.add('walkUp', [3, 4, 3, 5], 6, true);
     this.animations.add('walkRight', [6, 7, 6, 8], 6, true);
     this.animations.add('walkLeft', [9, 10, 9, 11], 6, true);
+  }
+
+  update () {
+    if (this.body.velocity.x == 0 && this.body.velocity.y == 0) {
+      this.animations.currentAnim.restart();
+      this.animations.stop();
+    }
   }
 
   move (x, y, facing, animation) {
@@ -29,16 +38,16 @@ export default class Alien extends Phaser.Sprite {
 
     switch (this.facing) {
       case LEFT:
-        this.body.moveTo(MOVE_DURATION, 16, 180)
+        this.body.velocity.x = -360
         break;
       case RIGHT:
-        this.body.moveTo(MOVE_DURATION, 16, 0)
+        this.body.velocity.x = 360
         break;
       case UP:
-        this.body.moveTo(MOVE_DURATION, 16, 270)
+        this.body.velocity.y = -360
         break;
       case DOWN:
-        this.body.moveTo(MOVE_DURATION, 16, 90)
+        this.body.velocity.y = 360
         break;
     }
   }

@@ -1,6 +1,6 @@
 export default class Enemies extends Phaser.Group {
   constructor (game, parent, name) {
-    super(game, parent, name)
+    super(game, parent, name);
   }
 
   setAlienBuilder (builder) {
@@ -19,7 +19,7 @@ export default class Enemies extends Phaser.Group {
   spawnAlien (x, y) {
     const alien = this.alienBuilder(game, x, y)
 
-    this.addChild(alien)
+    this.add(alien)
   }
 
   travel (enemy) {

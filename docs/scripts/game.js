@@ -165,7 +165,7 @@
 	      this.stage.backgroundColor = '#223344';
 	      this.world.setBounds(0, 0, this.world.width, this.world.height);
 	      this.player = _game_objects2.default.player(game, this.world.centerX, 60);
-	      this.enemies = _game_objects2.default.enemies(game, this.world);
+	      this.enemies = _game_objects2.default.enemies(game);
 	
 	      this.add.existing(this.titleText());
 	      this.add.existing(this.player);
@@ -191,6 +191,9 @@
 	  }, {
 	    key: 'update',
 	    value: function update() {
+	      this.game.physics.arcade.collide(this.player, this.enemies);
+	      this.game.physics.arcade.collide(this.enemies, this.enemies);
+	
 	      if (this.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
 	        this.player.moveLeft();
 	      }
@@ -328,7 +331,9 @@
 	
 	    game.physics.enable(_this);
 	
-	    _this.body.mass = 0;
+	    _this.body.drag.x = 1000;
+	    _this.body.drag.y = 1000;
+	
 	    _this.body.onCollide = new Phaser.Signal();
 	    _this.body.collideWorldBounds = true;
 	
@@ -340,6 +345,14 @@
 	  }
 	
 	  _createClass(Player, [{
+	    key: 'update',
+	    value: function update() {
+	      if (this.body.velocity.x == 0 && this.body.velocity.y == 0) {
+	        this.animations.currentAnim.restart();
+	        this.animations.stop();
+	      }
+	    }
+	  }, {
 	    key: 'move',
 	    value: function move(x, y, facing, animation) {
 	      if (animation) {
@@ -350,16 +363,16 @@
 	
 	      switch (this.facing) {
 	        case LEFT:
-	          this.body.moveTo(MOVE_DURATION, 16, 180);
+	          this.body.velocity.x = -160;
 	          break;
 	        case RIGHT:
-	          this.body.moveTo(MOVE_DURATION, 16, 0);
+	          this.body.velocity.x = 160;
 	          break;
 	        case UP:
-	          this.body.moveTo(MOVE_DURATION, 16, 270);
+	          this.body.velocity.y = -160;
 	          break;
 	        case DOWN:
-	          this.body.moveTo(MOVE_DURATION, 16, 90);
+	          this.body.velocity.y = 160;
 	          break;
 	      }
 	    }
@@ -441,7 +454,7 @@
 	    value: function spawnAlien(x, y) {
 	      var alien = this.alienBuilder(game, x, y);
 	
-	      this.addChild(alien);
+	      this.add(alien);
 	    }
 	  }, {
 	    key: "travel",
@@ -504,7 +517,9 @@
 	
 	    game.physics.enable(_this);
 	
-	    _this.body.mass = 0;
+	    _this.body.drag.x = 1000;
+	    _this.body.drag.y = 1000;
+	
 	    _this.body.onCollide = new Phaser.Signal();
 	    _this.body.collideWorldBounds = true;
 	
@@ -516,6 +531,14 @@
 	  }
 	
 	  _createClass(Alien, [{
+	    key: 'update',
+	    value: function update() {
+	      if (this.body.velocity.x == 0 && this.body.velocity.y == 0) {
+	        this.animations.currentAnim.restart();
+	        this.animations.stop();
+	      }
+	    }
+	  }, {
 	    key: 'move',
 	    value: function move(x, y, facing, animation) {
 	      if (animation) {
@@ -526,16 +549,16 @@
 	
 	      switch (this.facing) {
 	        case LEFT:
-	          this.body.moveTo(MOVE_DURATION, 16, 180);
+	          this.body.velocity.x = -360;
 	          break;
 	        case RIGHT:
-	          this.body.moveTo(MOVE_DURATION, 16, 0);
+	          this.body.velocity.x = 360;
 	          break;
 	        case UP:
-	          this.body.moveTo(MOVE_DURATION, 16, 270);
+	          this.body.velocity.y = -360;
 	          break;
 	        case DOWN:
-	          this.body.moveTo(MOVE_DURATION, 16, 90);
+	          this.body.velocity.y = 360;
 	          break;
 	      }
 	    }
