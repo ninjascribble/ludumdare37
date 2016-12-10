@@ -20,6 +20,9 @@ export default class SolarMeter extends Phaser.Group {
 
     this.hud = DisplayObjects.bodyFont(this.game, this.health, 16, 16);
 
+    this.onStartDraining = new Phaser.Signal();
+    this.onStartCharging = new Phaser.Signal();
+
     this.add(this.hud);
   }
 
@@ -28,6 +31,7 @@ export default class SolarMeter extends Phaser.Group {
       this.chargeTimer.stop(false);
       this.drainTimer.start();
       this.state = STATE_DRAINING;
+      this.onStartDraining.dispatch();
     }
   }
 
@@ -36,6 +40,7 @@ export default class SolarMeter extends Phaser.Group {
       this.drainTimer.stop(false);
       this.chargeTimer.start();
       this.state = STATE_CHARGING;
+      this.onStartCharging.dispatch();
     }
   }
 

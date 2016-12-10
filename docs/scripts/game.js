@@ -78,15 +78,15 @@
 	
 	var _Gameplay2 = _interopRequireDefault(_Gameplay);
 	
-	var _Gameover = __webpack_require__(12);
+	var _Gameover = __webpack_require__(13);
 	
 	var _Gameover2 = _interopRequireDefault(_Gameover);
 	
-	var _Loading = __webpack_require__(13);
+	var _Loading = __webpack_require__(14);
 	
 	var _Loading2 = _interopRequireDefault(_Loading);
 	
-	var _Menu = __webpack_require__(14);
+	var _Menu = __webpack_require__(15);
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
@@ -170,15 +170,19 @@
 	  _createClass(Gameplay, [{
 	    key: 'create',
 	    value: function create() {
+	      var _this2 = this;
+	
 	      this.stage.backgroundColor = '#223344';
 	      this.world.setBounds(0, 0, this.world.width, this.world.height);
 	      this.player = _game_objects2.default.player(game, this.world.centerX, 60);
+	      this.book = _game_objects2.default.book(game, this.world.centerX, 90);
 	      this.brick = _game_objects2.default.brick(game, this.world.centerX, 90);
 	      this.solarMeter = _game_objects2.default.solarMeter(game);
 	      this.enemies = _game_objects2.default.enemies(game);
 	      this.enemies.setSpawnPoints([{ x: -16, y: -16 }, { x: -16, y: this.world.centerY }, { x: -16, y: this.world.height + 16 }, { x: this.world.width + 16, y: -16 }, { x: this.world.width + 16, y: this.world.centerY }, { x: this.world.width + 16, y: this.world.height + 16 }, { x: -16, y: -16 }, { x: this.world.centerX, y: -16 }, { x: this.world.with + 16, y: -16 }, { x: -16, y: this.world.height + 16 }, { x: this.world.centerX, y: this.world.height + 16 }, { x: this.world.with + 16, y: this.world.height + 16 }]);
 	
 	      this.add.existing(this.brick);
+	      this.add.existing(this.book);
 	      this.add.existing(this.player);
 	      this.add.existing(this.enemies);
 	      this.add.existing(this.solarMeter);
@@ -186,6 +190,14 @@
 	      this.enemies.startMoveTimer();
 	      this.enemies.startSpawnTimer();
 	      this.solarMeter.draining();
+	
+	      this.solarMeter.onStartDraining.add(function () {
+	        _this2.book.close();
+	      }, this);
+	
+	      this.solarMeter.onStartCharging.add(function () {
+	        _this2.book.open();
+	      }, this);
 	    }
 	  }, {
 	    key: 'update',
@@ -295,21 +307,26 @@
 	
 	var _BrickSprite2 = _interopRequireDefault(_BrickSprite);
 	
+	var _Book = __webpack_require__(12);
+	
+	var _Book2 = _interopRequireDefault(_Book);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	//importing the bricksprite class
+	var PLAYER = 'player'; //importing the bricksprite class
 	
-	var PLAYER = 'player';
 	var ENEMIES = 'enemies';
 	var SOLAR_METER = 'solar_meter';
 	var ALIEN = 'alien';
 	var BRICK = 'brick';
+	var BOOK = 'book';
 	
 	module.exports = {
 	  load: function load(loader) {
 	    loader.load.spritesheet(PLAYER, 'assets/player.png', 16, 16);
 	    loader.load.spritesheet(ALIEN, 'assets/alien.png', 16, 16);
 	    loader.load.spritesheet(BRICK, 'assets/brick.png', 16, 16);
+	    loader.load.spritesheet(BOOK, 'assets/book.png', 16, 16);
 	  },
 	
 	  player: function player(game, x, y) {
@@ -334,6 +351,10 @@
 	
 	  solarMeter: function solarMeter(game, parent) {
 	    return new _SolarMeter2.default(game, parent, SOLAR_METER);
+	  },
+	
+	  book: function book(game, x, y) {
+	    return new _Book2.default(game, x, y, BOOK);
 	  }
 	};
 
@@ -717,6 +738,9 @@
 	
 	    _this.hud = _display_objects2.default.bodyFont(_this.game, _this.health, 16, 16);
 	
+	    _this.onStartDraining = new Phaser.Signal();
+	    _this.onStartCharging = new Phaser.Signal();
+	
 	    _this.add(_this.hud);
 	    return _this;
 	  }
@@ -728,6 +752,7 @@
 	        this.chargeTimer.stop(false);
 	        this.drainTimer.start();
 	        this.state = STATE_DRAINING;
+	        this.onStartDraining.dispatch();
 	      }
 	    }
 	  }, {
@@ -737,6 +762,7 @@
 	        this.drainTimer.stop(false);
 	        this.chargeTimer.start();
 	        this.state = STATE_CHARGING;
+	        this.onStartCharging.dispatch();
 	      }
 	    }
 	  }, {
@@ -903,6 +929,56 @@
 
 /***/ },
 /* 12 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Book = function (_Phaser$Sprite) {
+	  _inherits(Book, _Phaser$Sprite);
+	
+	  function Book(game, x, y, key) {
+	    _classCallCheck(this, Book);
+	
+	    // game.physics.enable(this);
+	    // this.body.immovable = true;
+	    var _this = _possibleConstructorReturn(this, (Book.__proto__ || Object.getPrototypeOf(Book)).call(this, game, x, y, key));
+	
+	    _this.animations.add('open', [0, 1, 2, 3], 6, false);
+	    _this.animations.add('close', [4, 5, 6, 7], 6, false);
+	    return _this;
+	  }
+	
+	  _createClass(Book, [{
+	    key: 'open',
+	    value: function open() {
+	      this.animations.play('open');
+	    }
+	  }, {
+	    key: 'close',
+	    value: function close() {
+	      this.animations.play('close');
+	    }
+	  }]);
+	
+	  return Book;
+	}(Phaser.Sprite);
+	
+	exports.default = Book;
+
+/***/ },
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -975,7 +1051,7 @@
 	exports.default = Gameover;
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1057,7 +1133,7 @@
 	exports.default = Loading;
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

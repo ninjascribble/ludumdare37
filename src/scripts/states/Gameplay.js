@@ -7,6 +7,7 @@ export default class Gameplay extends _State {
     this.stage.backgroundColor = '#223344';
     this.world.setBounds(0, 0, this.world.width, this.world.height);
     this.player = GameObjects.player(game, this.world.centerX, 60);
+    this.book = GameObjects.book(game, this.world.centerX, 90);
     this.brick = GameObjects.brick(game, this.world.centerX, 90);
     this.solarMeter = GameObjects.solarMeter(game);
     this.enemies = GameObjects.enemies(game);
@@ -26,6 +27,7 @@ export default class Gameplay extends _State {
     ]);
 
     this.add.existing(this.brick);
+    this.add.existing(this.book);
     this.add.existing(this.player);
     this.add.existing(this.enemies);
     this.add.existing(this.solarMeter);
@@ -33,6 +35,14 @@ export default class Gameplay extends _State {
     this.enemies.startMoveTimer();
     this.enemies.startSpawnTimer();
     this.solarMeter.draining();
+
+    this.solarMeter.onStartDraining.add(() => {
+      this.book.close();
+    }, this);
+
+    this.solarMeter.onStartCharging.add(() => {
+      this.book.open();
+    }, this);
   }
 
   update () {
