@@ -5,14 +5,28 @@ import DisplayObjects from '../display_objects';
 export default class Gameplay extends _State {
   create () {
     this.stage.backgroundColor = '#223344';
-    this.world.setBounds(0, 0, 1400, 1400);
+    this.world.setBounds(0, 0, this.world.width, this.world.height);
     this.player = GameObjects.player(game, this.world.centerX, 60);
+
     this.brick = GameObjects.brick(game, this.world.centerX, 90);
-    this.camera.follow(this.player, Phaser.Camera.FOLLOW_LOCKON);
+    this.enemies = GameObjects.enemies(game, this.world);
 
     this.add.existing(this.titleText());
-    this.add.existing(this.player);
     this.add.existing(this.brick);
+    this.add.existing(this.player);
+    this.add.existing(this.enemies);
+
+    this.enemies.spawnAlien(64, 64);
+    this.enemies.spawnAlien(64, this.world.height / 2);
+    this.enemies.spawnAlien(64, this.world.height - 64);
+    this.enemies.spawnAlien(this.world.width / 2, 64);
+    this.enemies.spawnAlien(this.world.width / 2, this.world.height / 2);
+    this.enemies.spawnAlien(this.world.width / 2, this.world.height - 64);
+    this.enemies.spawnAlien(this.world.width - 64, 64);
+    this.enemies.spawnAlien(this.world.width - 64, this.world.height / 2);
+    this.enemies.spawnAlien(this.world.width - 64, this.world.height - 64);
+
+    this.enemies.moveTimer();
   }
 
   titleText () {
@@ -20,20 +34,20 @@ export default class Gameplay extends _State {
   }
 
   update () {
-    if (this.input.keyboard.isDown(Phaser.Keyboard.A)) {
-      this.player.respawn(game.world.centerX, this.player.y);
-    }
-
-    if (this.input.keyboard.isDown(Phaser.Keyboard.O)) {
-      this.player.destroy();
-    }
-
     if (this.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
-      this.player.bankLeft();
-    } else if (this.input.keyboard.isDown(Phaser.Keyboard.RIGHT)) {
-      this.player.bankRight();
-    } else {
-      this.player.normal();
+      this.player.moveLeft();
+    }
+
+    if (this.input.keyboard.isDown(Phaser.Keyboard.RIGHT)) {
+      this.player.moveRight();
+    }
+
+    if (this.input.keyboard.isDown(Phaser.Keyboard.UP)) {
+      this.player.moveUp();
+    }
+
+    if (this.input.keyboard.isDown(Phaser.Keyboard.DOWN)) {
+      this.player.moveDown();
     }
   }
 }
