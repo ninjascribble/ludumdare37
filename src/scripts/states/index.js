@@ -1,4 +1,5 @@
 import Gameplay from './Gameplay';
+import Gameover from './Gameover';
 import Loading from './Loading';
 import Menu from './Menu';
 
@@ -13,6 +14,10 @@ module.exports = {
 
   gameplay: function gameplay (stateManager) {
     changeState(stateManager, Gameplay);
+  },
+
+  gameover: function gameover (stateManager) {
+    changeState(stateManager, Gameover);
   }
 };
 

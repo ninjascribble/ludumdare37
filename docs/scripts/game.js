@@ -78,11 +78,15 @@
 	
 	var _Gameplay2 = _interopRequireDefault(_Gameplay);
 	
-	var _Loading = __webpack_require__(12);
+	var _Gameover = __webpack_require__(12);
+	
+	var _Gameover2 = _interopRequireDefault(_Gameover);
+	
+	var _Loading = __webpack_require__(13);
 	
 	var _Loading2 = _interopRequireDefault(_Loading);
 	
-	var _Menu = __webpack_require__(13);
+	var _Menu = __webpack_require__(14);
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
@@ -99,6 +103,10 @@
 	
 	  gameplay: function gameplay(stateManager) {
 	    changeState(stateManager, _Gameplay2.default);
+	  },
+	
+	  gameover: function gameover(stateManager) {
+	    changeState(stateManager, _Gameover2.default);
 	  }
 	};
 	
@@ -206,6 +214,10 @@
 	        this.solarMeter.charging();
 	      } else {
 	        this.solarMeter.draining();
+	      }
+	
+	      if (this.solarMeter.health <= 0) {
+	        this.stateProvider.gameover(this.state);
 	      }
 	    }
 	  }, {
@@ -909,6 +921,79 @@
 	
 	var _display_objects2 = _interopRequireDefault(_display_objects);
 	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Gameover = function (_State2) {
+	  _inherits(Gameover, _State2);
+	
+	  function Gameover() {
+	    _classCallCheck(this, Gameover);
+	
+	    return _possibleConstructorReturn(this, (Gameover.__proto__ || Object.getPrototypeOf(Gameover)).apply(this, arguments));
+	  }
+	
+	  _createClass(Gameover, [{
+	    key: 'create',
+	    value: function create() {
+	      // this.stage.backgroundColor = '#AACCCC';
+	      this.stage.disableVisibilityChange = true;
+	      this.add.existing(this.titleText());
+	      this.add.existing(this.actionText());
+	    }
+	  }, {
+	    key: 'titleText',
+	    value: function titleText() {
+	      return _display_objects2.default.displayFont(game, 'Game Over', this.world.centerX, 100, 'center');
+	    }
+	  }, {
+	    key: 'actionText',
+	    value: function actionText() {
+	      var text = _display_objects2.default.bodyFont(game, 'Press Spacebar to Play!', this.world.centerX, 190, 'center');
+	      this.time.events.loop(400, function () {
+	        return text.visible = !text.visible;
+	      });
+	      return text;
+	    }
+	  }, {
+	    key: 'update',
+	    value: function update() {
+	      if (this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+	        this.stateProvider.gameplay(this.state);
+	      }
+	    }
+	  }]);
+	
+	  return Gameover;
+	}(_State4.default);
+	
+	exports.default = Gameover;
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _State3 = __webpack_require__(3);
+	
+	var _State4 = _interopRequireDefault(_State3);
+	
+	var _display_objects = __webpack_require__(9);
+	
+	var _display_objects2 = _interopRequireDefault(_display_objects);
+	
 	var _game_objects = __webpack_require__(4);
 	
 	var _game_objects2 = _interopRequireDefault(_game_objects);
@@ -972,7 +1057,7 @@
 	exports.default = Loading;
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

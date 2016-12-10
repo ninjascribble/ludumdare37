@@ -61,6 +61,10 @@ export default class Gameplay extends _State {
     } else {
       this.solarMeter.draining();
     }
+
+    if (this.solarMeter.health <= 0) {
+      this.stateProvider.gameover(this.state);
+    }
   }
 
   onPlayerEnemyCollide (player, enemy) {
