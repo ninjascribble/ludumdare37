@@ -12,6 +12,7 @@ export default class Alien extends Phaser.Sprite {
 
     this.body.mass = 0;
     this.body.onCollide = new Phaser.Signal();
+    this.body.collideWorldBounds = true;
 
     this.animations.add('walkDown', [0, 1, 0, 2], 6, true);
     this.animations.add('walkUp', [3, 4, 3, 5], 6, true);

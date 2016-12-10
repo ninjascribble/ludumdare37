@@ -1,7 +1,9 @@
 import Player from './Player';
+import Enemies from './Enemies';
 import Alien from './Alien';
 
 const PLAYER = 'player';
+const ENEMIES = 'enemies';
 const ALIEN = 'alien';
 
 module.exports = {
@@ -12,6 +14,14 @@ module.exports = {
 
   player: function player (game, x, y) {
     return new Player(game, x, y, PLAYER);
+  },
+
+  enemies: function enemies (game, parent) {
+    const group = new Enemies(game, parent, ENEMIES);
+
+    group.setAlienBuilder(module.exports.alien)
+
+    return group;
   },
 
   alien: function alien (game, x, y) {

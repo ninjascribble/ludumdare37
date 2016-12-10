@@ -78,11 +78,11 @@
 	
 	var _Gameplay2 = _interopRequireDefault(_Gameplay);
 	
-	var _Loading = __webpack_require__(9);
+	var _Loading = __webpack_require__(10);
 	
 	var _Loading2 = _interopRequireDefault(_Loading);
 	
-	var _Menu = __webpack_require__(10);
+	var _Menu = __webpack_require__(11);
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
@@ -138,7 +138,7 @@
 	
 	var _game_objects2 = _interopRequireDefault(_game_objects);
 	
-	var _display_objects = __webpack_require__(7);
+	var _display_objects = __webpack_require__(8);
 	
 	var _display_objects2 = _interopRequireDefault(_display_objects);
 	
@@ -163,12 +163,24 @@
 	    key: 'create',
 	    value: function create() {
 	      this.stage.backgroundColor = '#223344';
-	      this.world.setBounds(0, 0, 1400, 1400);
+	      this.world.setBounds(0, 0, this.world.width, this.world.height);
 	      this.player = _game_objects2.default.player(game, this.world.centerX, 60);
-	      this.camera.follow(this.player, Phaser.Camera.FOLLOW_LOCKON);
+	      this.enemies = _game_objects2.default.enemies(game, this.world);
 	
 	      this.add.existing(this.titleText());
 	      this.add.existing(this.player);
+	
+	      this.enemies.spawnAlien(64, 64);
+	      this.enemies.spawnAlien(64, this.world.height / 2);
+	      this.enemies.spawnAlien(64, this.world.height - 64);
+	      this.enemies.spawnAlien(this.world.width / 2, 64);
+	      this.enemies.spawnAlien(this.world.width / 2, this.world.height / 2);
+	      this.enemies.spawnAlien(this.world.width / 2, this.world.height - 64);
+	      this.enemies.spawnAlien(this.world.width - 64, 64);
+	      this.enemies.spawnAlien(this.world.width - 64, this.world.height / 2);
+	      this.enemies.spawnAlien(this.world.width - 64, this.world.height - 64);
+	
+	      this.enemies.moveTimer();
 	    }
 	  }, {
 	    key: 'titleText',
@@ -244,13 +256,18 @@
 	
 	var _Player2 = _interopRequireDefault(_Player);
 	
-	var _Alien = __webpack_require__(6);
+	var _Enemies = __webpack_require__(6);
+	
+	var _Enemies2 = _interopRequireDefault(_Enemies);
+	
+	var _Alien = __webpack_require__(7);
 	
 	var _Alien2 = _interopRequireDefault(_Alien);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var PLAYER = 'player';
+	var ENEMIES = 'enemies';
 	var ALIEN = 'alien';
 	
 	module.exports = {
@@ -261,6 +278,14 @@
 	
 	  player: function player(game, x, y) {
 	    return new _Player2.default(game, x, y, PLAYER);
+	  },
+	
+	  enemies: function enemies(game, parent) {
+	    var group = new _Enemies2.default(game, parent, ENEMIES);
+	
+	    group.setAlienBuilder(module.exports.alien);
+	
+	    return group;
 	  },
 	
 	  alien: function alien(game, x, y) {
@@ -304,6 +329,7 @@
 	
 	    _this.body.mass = 0;
 	    _this.body.onCollide = new Phaser.Signal();
+	    _this.body.collideWorldBounds = true;
 	
 	    _this.animations.add('walkDown', [0, 1, 0, 2], 6, true);
 	    _this.animations.add('walkUp', [3, 4, 3, 5], 6, true);
@@ -367,6 +393,88 @@
 /* 6 */
 /***/ function(module, exports) {
 
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Enemies = function (_Phaser$Group) {
+	  _inherits(Enemies, _Phaser$Group);
+	
+	  function Enemies(game, parent, name) {
+	    var addToStage = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
+	
+	    _classCallCheck(this, Enemies);
+	
+	    return _possibleConstructorReturn(this, (Enemies.__proto__ || Object.getPrototypeOf(Enemies)).call(this, game, parent, name, addToStage));
+	  }
+	
+	  _createClass(Enemies, [{
+	    key: "setAlienBuilder",
+	    value: function setAlienBuilder(builder) {
+	      this.alienBuilder = builder;
+	    }
+	  }, {
+	    key: "moveTimer",
+	    value: function moveTimer() {
+	      var _this2 = this;
+	
+	      var moveDelay = this.game.time.create();
+	
+	      this.children.forEach(function (enemy) {
+	        moveDelay.loop(500, function () {
+	          return _this2.travel(enemy);
+	        }, _this2);
+	        moveDelay.start();
+	      });
+	    }
+	  }, {
+	    key: "spawnAlien",
+	    value: function spawnAlien(x, y) {
+	      var alien = this.alienBuilder(game, x, y);
+	
+	      this.addChild(alien);
+	    }
+	  }, {
+	    key: "travel",
+	    value: function travel(enemy) {
+	      var dirNum = this.game.rnd.integerInRange(1, 4);
+	
+	      switch (dirNum) {
+	        case 1:
+	          enemy.moveLeft(this.obstacles);
+	          break;
+	        case 2:
+	          enemy.moveRight(this.obstacles);
+	          break;
+	        case 3:
+	          enemy.moveUp(this.obstacles);
+	          break;
+	        case 4:
+	          enemy.moveDown(this.obstacles);
+	          break;
+	      }
+	    }
+	  }]);
+	
+	  return Enemies;
+	}(Phaser.Group);
+	
+	exports.default = Enemies;
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
@@ -399,6 +507,7 @@
 	
 	    _this.body.mass = 0;
 	    _this.body.onCollide = new Phaser.Signal();
+	    _this.body.collideWorldBounds = true;
 	
 	    _this.animations.add('walkDown', [0, 1, 0, 2], 6, true);
 	    _this.animations.add('walkUp', [3, 4, 3, 5], 6, true);
@@ -459,12 +568,12 @@
 	exports.default = Alien;
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var _BitmapFont = __webpack_require__(8);
+	var _BitmapFont = __webpack_require__(9);
 	
 	var _BitmapFont2 = _interopRequireDefault(_BitmapFont);
 	
@@ -499,7 +608,7 @@
 	};
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -561,7 +670,7 @@
 	exports.default = BitmapFont;
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -576,7 +685,7 @@
 	
 	var _State4 = _interopRequireDefault(_State3);
 	
-	var _display_objects = __webpack_require__(7);
+	var _display_objects = __webpack_require__(8);
 	
 	var _display_objects2 = _interopRequireDefault(_display_objects);
 	
@@ -643,7 +752,7 @@
 	exports.default = Loading;
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -658,7 +767,7 @@
 	
 	var _State4 = _interopRequireDefault(_State3);
 	
-	var _display_objects = __webpack_require__(7);
+	var _display_objects = __webpack_require__(8);
 	
 	var _display_objects2 = _interopRequireDefault(_display_objects);
 	

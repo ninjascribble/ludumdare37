@@ -5,12 +5,24 @@ import DisplayObjects from '../display_objects';
 export default class Gameplay extends _State {
   create () {
     this.stage.backgroundColor = '#223344';
-    this.world.setBounds(0, 0, 1400, 1400);
+    this.world.setBounds(0, 0, this.world.width, this.world.height);
     this.player = GameObjects.player(game, this.world.centerX, 60);
-    this.camera.follow(this.player, Phaser.Camera.FOLLOW_LOCKON);
+    this.enemies = GameObjects.enemies(game, this.world);
 
     this.add.existing(this.titleText());
     this.add.existing(this.player);
+
+    this.enemies.spawnAlien(64, 64);
+    this.enemies.spawnAlien(64, this.world.height / 2);
+    this.enemies.spawnAlien(64, this.world.height - 64);
+    this.enemies.spawnAlien(this.world.width / 2, 64);
+    this.enemies.spawnAlien(this.world.width / 2, this.world.height / 2);
+    this.enemies.spawnAlien(this.world.width / 2, this.world.height - 64);
+    this.enemies.spawnAlien(this.world.width - 64, 64);
+    this.enemies.spawnAlien(this.world.width - 64, this.world.height / 2);
+    this.enemies.spawnAlien(this.world.width - 64, this.world.height - 64);
+
+    this.enemies.moveTimer();
   }
 
   titleText () {
