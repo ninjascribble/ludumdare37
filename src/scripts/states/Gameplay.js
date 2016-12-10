@@ -38,7 +38,7 @@ export default class Gameplay extends _State {
   }
 
   update () {
-    this.game.physics.arcade.collide(this.player, this.enemies);
+    this.game.physics.arcade.overlap(this.player, this.enemies, this.onPlayerEnemyCollide);
     this.game.physics.arcade.collide(this.enemies, this.enemies);
     this.game.physics.arcade.collide(this.brick, this.player);
     this.game.physics.arcade.collide(this.brick, this.enemies);
@@ -58,5 +58,9 @@ export default class Gameplay extends _State {
     if (this.input.keyboard.isDown(Phaser.Keyboard.DOWN)) {
       this.player.moveDown();
     }
+  }
+
+  onPlayerEnemyCollide (player, enemy) {
+    enemy.kill();
   }
 }

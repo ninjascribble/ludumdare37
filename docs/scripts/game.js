@@ -185,7 +185,7 @@
 	  }, {
 	    key: 'update',
 	    value: function update() {
-	      this.game.physics.arcade.collide(this.player, this.enemies);
+	      this.game.physics.arcade.overlap(this.player, this.enemies, this.onPlayerEnemyCollide);
 	      this.game.physics.arcade.collide(this.enemies, this.enemies);
 	      this.game.physics.arcade.collide(this.brick, this.player);
 	      this.game.physics.arcade.collide(this.brick, this.enemies);
@@ -205,6 +205,11 @@
 	      if (this.input.keyboard.isDown(Phaser.Keyboard.DOWN)) {
 	        this.player.moveDown();
 	      }
+	    }
+	  }, {
+	    key: 'onPlayerEnemyCollide',
+	    value: function onPlayerEnemyCollide(player, enemy) {
+	      enemy.kill();
 	    }
 	  }]);
 	
@@ -487,9 +492,16 @@
 	  }, {
 	    key: "spawnAlienAt",
 	    value: function spawnAlienAt(x, y) {
-	      var alien = this.alienBuilder(game, x, y);
+	      if (this.countLiving() > 500) {
+	        return;
+	      }
 	
+	      var alien = this.getFirstDead() || this.alienBuilder(game);
+	
+	      alien.x = x;
+	      alien.y = y;
 	      alien.body.collideWorldBounds = false;
+	      alien.revive();
 	      this.add(alien);
 	    }
 	  }]);

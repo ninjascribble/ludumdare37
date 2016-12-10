@@ -37,9 +37,16 @@ export default class Enemies extends Phaser.Group {
   }
 
   spawnAlienAt (x, y) {
-    const alien = this.alienBuilder(game, x, y)
+    if (this.countLiving() > 500) {
+      return;
+    }
 
+    const alien = this.getFirstDead() || this.alienBuilder(game);
+
+    alien.x = x;
+    alien.y = y;
     alien.body.collideWorldBounds = false;
+    alien.revive()
     this.add(alien)
   }
 }
