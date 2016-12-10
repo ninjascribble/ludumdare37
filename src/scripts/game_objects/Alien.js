@@ -29,6 +29,21 @@ export default class Alien extends Phaser.Sprite {
     }
   }
 
+  travel () {
+    const dirNum = this.game.rnd.integerInRange(1, 4);
+
+    switch (dirNum) {
+      case 1: this.moveLeft();
+        break;
+      case 2: this.moveRight();
+        break;
+      case 3: this.moveUp();
+        break;
+      case 4: this.moveDown();
+        break;
+    }
+  }
+
   move (x, y, facing, animation) {
     if (animation) {
       this.animations.play(animation);

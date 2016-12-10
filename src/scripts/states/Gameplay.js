@@ -9,23 +9,28 @@ export default class Gameplay extends _State {
     this.player = GameObjects.player(game, this.world.centerX, 60);
     this.brick = GameObjects.brick(game, this.world.centerX, 90);
     this.enemies = GameObjects.enemies(game);
+    this.enemies.setSpawnPoints([
+      { x: -16, y: -16 },
+      { x: -16, y: this.world.centerY },
+      { x: -16, y: this.world.height + 16 },
+      { x: this.world.width + 16, y: -16 },
+      { x: this.world.width + 16, y: this.world.centerY },
+      { x: this.world.width + 16, y: this.world.height + 16 },
+      { x: -16, y: -16 },
+      { x: this.world.centerX, y: -16 },
+      { x: this.world.with + 16, y: -16 },
+      { x: -16, y: this.world.height + 16 },
+      { x: this.world.centerX, y: this.world.height + 16 },
+      { x: this.world.with + 16, y: this.world.height + 16 }
+    ]);
 
     this.add.existing(this.titleText());
     this.add.existing(this.brick);
     this.add.existing(this.player);
     this.add.existing(this.enemies);
 
-    this.enemies.spawnAlien(64, 64);
-    this.enemies.spawnAlien(64, this.world.height / 2);
-    this.enemies.spawnAlien(64, this.world.height - 64);
-    this.enemies.spawnAlien(this.world.width / 2, 64);
-    this.enemies.spawnAlien(this.world.width / 2, this.world.height / 2);
-    this.enemies.spawnAlien(this.world.width / 2, this.world.height - 64);
-    this.enemies.spawnAlien(this.world.width - 64, 64);
-    this.enemies.spawnAlien(this.world.width - 64, this.world.height / 2);
-    this.enemies.spawnAlien(this.world.width - 64, this.world.height - 64);
-
-    this.enemies.moveTimer();
+    this.enemies.startMoveTimer();
+    this.enemies.startSpawnTimer();
   }
 
   titleText () {

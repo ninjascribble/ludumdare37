@@ -167,23 +167,15 @@
 	      this.player = _game_objects2.default.player(game, this.world.centerX, 60);
 	      this.brick = _game_objects2.default.brick(game, this.world.centerX, 90);
 	      this.enemies = _game_objects2.default.enemies(game);
+	      this.enemies.setSpawnPoints([{ x: -16, y: -16 }, { x: -16, y: this.world.centerY }, { x: -16, y: this.world.height + 16 }, { x: this.world.width + 16, y: -16 }, { x: this.world.width + 16, y: this.world.centerY }, { x: this.world.width + 16, y: this.world.height + 16 }, { x: -16, y: -16 }, { x: this.world.centerX, y: -16 }, { x: this.world.with + 16, y: -16 }, { x: -16, y: this.world.height + 16 }, { x: this.world.centerX, y: this.world.height + 16 }, { x: this.world.with + 16, y: this.world.height + 16 }]);
 	
 	      this.add.existing(this.titleText());
 	      this.add.existing(this.brick);
 	      this.add.existing(this.player);
 	      this.add.existing(this.enemies);
 	
-	      this.enemies.spawnAlien(64, 64);
-	      this.enemies.spawnAlien(64, this.world.height / 2);
-	      this.enemies.spawnAlien(64, this.world.height - 64);
-	      this.enemies.spawnAlien(this.world.width / 2, 64);
-	      this.enemies.spawnAlien(this.world.width / 2, this.world.height / 2);
-	      this.enemies.spawnAlien(this.world.width / 2, this.world.height - 64);
-	      this.enemies.spawnAlien(this.world.width - 64, 64);
-	      this.enemies.spawnAlien(this.world.width - 64, this.world.height / 2);
-	      this.enemies.spawnAlien(this.world.width - 64, this.world.height - 64);
-	
-	      this.enemies.moveTimer();
+	      this.enemies.startMoveTimer();
+	      this.enemies.startSpawnTimer();
 	    }
 	  }, {
 	    key: 'titleText',
@@ -437,6 +429,9 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
+	var MOVE_DELAY = 500;
+	var SPAWN_DELAY = 200;
+	
 	var Enemies = function (_Phaser$Group) {
 	  _inherits(Enemies, _Phaser$Group);
 	
@@ -452,45 +447,50 @@
 	      this.alienBuilder = builder;
 	    }
 	  }, {
-	    key: "moveTimer",
-	    value: function moveTimer() {
+	    key: "setSpawnPoints",
+	    value: function setSpawnPoints(spawnPoints) {
+	      this.spawnPoints = spawnPoints;
+	    }
+	  }, {
+	    key: "startMoveTimer",
+	    value: function startMoveTimer() {
 	      var _this2 = this;
 	
-	      var moveDelay = this.game.time.create();
+	      var timer = this.game.time.create();
 	
-	      this.children.forEach(function (enemy) {
-	        moveDelay.loop(500, function () {
-	          return _this2.travel(enemy);
-	        }, _this2);
-	        moveDelay.start();
-	      });
+	      timer.loop(MOVE_DELAY, function () {
+	        _this2.children.forEach(function (enemy) {
+	          return enemy.travel();
+	        });
+	      }, this);
+	      timer.start();
+	    }
+	  }, {
+	    key: "startSpawnTimer",
+	    value: function startSpawnTimer() {
+	      var _this3 = this;
+	
+	      var timer = this.game.time.create();
+	
+	      timer.loop(SPAWN_DELAY, function () {
+	        return _this3.spawnAlien();
+	      }, this);
+	      timer.start();
 	    }
 	  }, {
 	    key: "spawnAlien",
-	    value: function spawnAlien(x, y) {
-	      var alien = this.alienBuilder(game, x, y);
+	    value: function spawnAlien() {
+	      var spawnPoint = this.game.rnd.pick(this.spawnPoints);
 	
-	      this.add(alien);
+	      this.spawnAlienAt(spawnPoint.x, spawnPoint.y);
 	    }
 	  }, {
-	    key: "travel",
-	    value: function travel(enemy) {
-	      var dirNum = this.game.rnd.integerInRange(1, 4);
+	    key: "spawnAlienAt",
+	    value: function spawnAlienAt(x, y) {
+	      var alien = this.alienBuilder(game, x, y);
 	
-	      switch (dirNum) {
-	        case 1:
-	          enemy.moveLeft(this.obstacles);
-	          break;
-	        case 2:
-	          enemy.moveRight(this.obstacles);
-	          break;
-	        case 3:
-	          enemy.moveUp(this.obstacles);
-	          break;
-	        case 4:
-	          enemy.moveDown(this.obstacles);
-	          break;
-	      }
+	      alien.body.collideWorldBounds = false;
+	      this.add(alien);
 	    }
 	  }]);
 	
@@ -552,6 +552,26 @@
 	      if (this.body.velocity.x == 0 && this.body.velocity.y == 0) {
 	        this.animations.currentAnim.restart();
 	        this.animations.stop();
+	      }
+	    }
+	  }, {
+	    key: 'travel',
+	    value: function travel() {
+	      var dirNum = this.game.rnd.integerInRange(1, 4);
+	
+	      switch (dirNum) {
+	        case 1:
+	          this.moveLeft();
+	          break;
+	        case 2:
+	          this.moveRight();
+	          break;
+	        case 3:
+	          this.moveUp();
+	          break;
+	        case 4:
+	          this.moveDown();
+	          break;
 	      }
 	    }
 	  }, {
