@@ -78,11 +78,11 @@
 	
 	var _Gameplay2 = _interopRequireDefault(_Gameplay);
 	
-	var _Loading = __webpack_require__(8);
+	var _Loading = __webpack_require__(9);
 	
 	var _Loading2 = _interopRequireDefault(_Loading);
 	
-	var _Menu = __webpack_require__(9);
+	var _Menu = __webpack_require__(10);
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
@@ -138,7 +138,7 @@
 	
 	var _game_objects2 = _interopRequireDefault(_game_objects);
 	
-	var _display_objects = __webpack_require__(6);
+	var _display_objects = __webpack_require__(7);
 	
 	var _display_objects2 = _interopRequireDefault(_display_objects);
 	
@@ -244,17 +244,27 @@
 	
 	var _Player2 = _interopRequireDefault(_Player);
 	
+	var _Alien = __webpack_require__(6);
+	
+	var _Alien2 = _interopRequireDefault(_Alien);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var PLAYER = 'player';
+	var ALIEN = 'alien';
 	
 	module.exports = {
 	  load: function load(loader) {
 	    loader.load.spritesheet(PLAYER, 'assets/player.png', 16, 16);
+	    loader.load.spritesheet(ALIEN, 'assets/alien.png', 16, 16);
 	  },
 	
 	  player: function player(game, x, y) {
 	    return new _Player2.default(game, x, y, PLAYER);
+	  },
+	
+	  alien: function alien(game, x, y) {
+	    return new _Alien2.default(game, x, y, ALIEN);
 	  }
 	};
 
@@ -282,13 +292,13 @@
 	var LEFT = 'left';
 	var RIGHT = 'right';
 	
-	var TrumpSprite = function (_Phaser$Sprite) {
-	  _inherits(TrumpSprite, _Phaser$Sprite);
+	var Player = function (_Phaser$Sprite) {
+	  _inherits(Player, _Phaser$Sprite);
 	
-	  function TrumpSprite(game, x, y, key) {
-	    _classCallCheck(this, TrumpSprite);
+	  function Player(game, x, y, key) {
+	    _classCallCheck(this, Player);
 	
-	    var _this = _possibleConstructorReturn(this, (TrumpSprite.__proto__ || Object.getPrototypeOf(TrumpSprite)).call(this, game, x, y, key));
+	    var _this = _possibleConstructorReturn(this, (Player.__proto__ || Object.getPrototypeOf(Player)).call(this, game, x, y, key));
 	
 	    game.physics.enable(_this);
 	
@@ -302,7 +312,7 @@
 	    return _this;
 	  }
 	
-	  _createClass(TrumpSprite, [{
+	  _createClass(Player, [{
 	    key: 'move',
 	    value: function move(x, y, facing, animation) {
 	      if (animation) {
@@ -348,18 +358,113 @@
 	    }
 	  }]);
 	
-	  return TrumpSprite;
+	  return Player;
 	}(Phaser.Sprite);
 	
-	exports.default = TrumpSprite;
+	exports.default = Player;
 
 /***/ },
 /* 6 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var MOVE_DURATION = 100;
+	var UP = 'up';
+	var DOWN = 'down';
+	var LEFT = 'left';
+	var RIGHT = 'right';
+	
+	var Alien = function (_Phaser$Sprite) {
+	  _inherits(Alien, _Phaser$Sprite);
+	
+	  function Alien(game, x, y, key) {
+	    _classCallCheck(this, Alien);
+	
+	    var _this = _possibleConstructorReturn(this, (Alien.__proto__ || Object.getPrototypeOf(Alien)).call(this, game, x, y, key));
+	
+	    game.physics.enable(_this);
+	
+	    _this.body.mass = 0;
+	    _this.body.onCollide = new Phaser.Signal();
+	
+	    _this.animations.add('walkDown', [0, 1, 0, 2], 6, true);
+	    _this.animations.add('walkUp', [3, 4, 3, 5], 6, true);
+	    _this.animations.add('walkRight', [6, 7, 6, 8], 6, true);
+	    _this.animations.add('walkLeft', [9, 10, 9, 11], 6, true);
+	    return _this;
+	  }
+	
+	  _createClass(Alien, [{
+	    key: 'move',
+	    value: function move(x, y, facing, animation) {
+	      if (animation) {
+	        this.animations.play(animation);
+	      }
+	
+	      this.facing = facing;
+	
+	      switch (this.facing) {
+	        case LEFT:
+	          this.body.moveTo(MOVE_DURATION, 16, 180);
+	          break;
+	        case RIGHT:
+	          this.body.moveTo(MOVE_DURATION, 16, 0);
+	          break;
+	        case UP:
+	          this.body.moveTo(MOVE_DURATION, 16, 270);
+	          break;
+	        case DOWN:
+	          this.body.moveTo(MOVE_DURATION, 16, 90);
+	          break;
+	      }
+	    }
+	  }, {
+	    key: 'moveLeft',
+	    value: function moveLeft() {
+	      this.move(-16, 0, LEFT, 'walkLeft');
+	    }
+	  }, {
+	    key: 'moveRight',
+	    value: function moveRight() {
+	      this.move(16, 0, RIGHT, 'walkRight');
+	    }
+	  }, {
+	    key: 'moveUp',
+	    value: function moveUp() {
+	      this.move(0, -16, UP, 'walkUp');
+	    }
+	  }, {
+	    key: 'moveDown',
+	    value: function moveDown() {
+	      this.move(0, 16, DOWN, 'walkDown');
+	    }
+	  }]);
+	
+	  return Alien;
+	}(Phaser.Sprite);
+	
+	exports.default = Alien;
+
+/***/ },
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var _BitmapFont = __webpack_require__(7);
+	var _BitmapFont = __webpack_require__(8);
 	
 	var _BitmapFont2 = _interopRequireDefault(_BitmapFont);
 	
@@ -394,7 +499,7 @@
 	};
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -456,7 +561,7 @@
 	exports.default = BitmapFont;
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -471,7 +576,7 @@
 	
 	var _State4 = _interopRequireDefault(_State3);
 	
-	var _display_objects = __webpack_require__(6);
+	var _display_objects = __webpack_require__(7);
 	
 	var _display_objects2 = _interopRequireDefault(_display_objects);
 	
@@ -538,7 +643,7 @@
 	exports.default = Loading;
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -553,7 +658,7 @@
 	
 	var _State4 = _interopRequireDefault(_State3);
 	
-	var _display_objects = __webpack_require__(6);
+	var _display_objects = __webpack_require__(7);
 	
 	var _display_objects2 = _interopRequireDefault(_display_objects);
 	

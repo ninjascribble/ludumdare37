@@ -4,7 +4,7 @@ const DOWN = 'down';
 const LEFT = 'left';
 const RIGHT = 'right';
 
-export default class Player extends Phaser.Sprite {
+export default class Alien extends Phaser.Sprite {
   constructor (game, x, y, key) {
     super(game, x, y, key);
 
