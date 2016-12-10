@@ -7,13 +7,25 @@ export default class Gameplay extends _State {
     this.stage.backgroundColor = '#223344';
     this.world.setBounds(0, 0, this.world.width, this.world.height);
     this.player = GameObjects.player(game, this.world.centerX, 60);
-    this.brick = GameObjects.brick(game, this.world.centerX, 90);
+    this.bricks = GameObjects.bricks(game);
     this.enemies = GameObjects.enemies(game);
 
     this.add.existing(this.titleText());
-    this.add.existing(this.brick);
     this.add.existing(this.player);
     this.add.existing(this.enemies);
+    this.add.existing(this.bricks);
+
+    this.bricks.addBrick(144, 128);
+    this.bricks.addBrick(160, 128);
+    this.bricks.addBrick(176, 128);
+    this.bricks.addBrick(144, 144);
+    this.bricks.addBrick(160, 144);
+    this.bricks.addBrick(176, 144);
+    this.bricks.addBrick(144, 160);
+    this.bricks.addBrick(160, 160);
+    this.bricks.addBrick(176, 160);
+
+
 
     this.enemies.spawnAlien(64, 64);
     this.enemies.spawnAlien(64, this.world.height / 2);

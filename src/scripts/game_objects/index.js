@@ -2,13 +2,15 @@ import Player from './Player';
 import Enemies from './Enemies';
 import Alien from './Alien';
 import BrickSprite from './BrickSprite'; //importing the bricksprite class
+import Bricks from './Bricks';
+
 
 
 const PLAYER = 'player';
 const ENEMIES = 'enemies';
 const ALIEN = 'alien';
 const BRICK = 'brick';
-
+const BRICKS = 'bricks';
 
 module.exports = {
   load: function load (loader) {
@@ -19,6 +21,13 @@ module.exports = {
 
   player: function player (game, x, y) {
     return new Player(game, x, y, PLAYER);
+  },
+
+  bricks: function bricks(game, parent){
+    const group = new Bricks(game, parent, BRICKS);
+    group.setBrickBuilder(module.exports.brick);
+
+    return group;
   },
 
   enemies: function enemies (game, parent) {
@@ -32,6 +41,7 @@ module.exports = {
   alien: function alien (game, x, y) {
     return new Alien(game, x, y, ALIEN);
   },
+
   brick: function brickSprite (game, x, y) {
     return new BrickSprite(game, x, y, BRICK);
   }
