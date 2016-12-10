@@ -78,11 +78,11 @@
 	
 	var _Gameplay2 = _interopRequireDefault(_Gameplay);
 	
-	var _Loading = __webpack_require__(10);
+	var _Loading = __webpack_require__(11);
 	
 	var _Loading2 = _interopRequireDefault(_Loading);
 	
-	var _Menu = __webpack_require__(11);
+	var _Menu = __webpack_require__(12);
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
@@ -138,7 +138,7 @@
 	
 	var _game_objects2 = _interopRequireDefault(_game_objects);
 	
-	var _display_objects = __webpack_require__(8);
+	var _display_objects = __webpack_require__(9);
 	
 	var _display_objects2 = _interopRequireDefault(_display_objects);
 	
@@ -165,9 +165,11 @@
 	      this.stage.backgroundColor = '#223344';
 	      this.world.setBounds(0, 0, this.world.width, this.world.height);
 	      this.player = _game_objects2.default.player(game, this.world.centerX, 60);
+	      this.brick = _game_objects2.default.brick(game, this.world.centerX, 90);
 	      this.enemies = _game_objects2.default.enemies(game);
 	
 	      this.add.existing(this.titleText());
+	      this.add.existing(this.brick);
 	      this.add.existing(this.player);
 	      this.add.existing(this.enemies);
 	
@@ -193,6 +195,8 @@
 	    value: function update() {
 	      this.game.physics.arcade.collide(this.player, this.enemies);
 	      this.game.physics.arcade.collide(this.enemies, this.enemies);
+	      this.game.physics.arcade.collide(this.brick, this.player);
+	      this.game.physics.arcade.collide(this.brick, this.enemies);
 	
 	      if (this.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
 	        this.player.moveLeft();
@@ -268,16 +272,25 @@
 	
 	var _Alien2 = _interopRequireDefault(_Alien);
 	
+	var _BrickSprite = __webpack_require__(8);
+	
+	var _BrickSprite2 = _interopRequireDefault(_BrickSprite);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	//importing the bricksprite class
+	
 	
 	var PLAYER = 'player';
 	var ENEMIES = 'enemies';
 	var ALIEN = 'alien';
+	var BRICK = 'brick';
 	
 	module.exports = {
 	  load: function load(loader) {
 	    loader.load.spritesheet(PLAYER, 'assets/player.png', 16, 16);
 	    loader.load.spritesheet(ALIEN, 'assets/alien.png', 16, 16);
+	    loader.load.spritesheet(BRICK, 'assets/brick.png', 16, 16);
 	  },
 	
 	  player: function player(game, x, y) {
@@ -294,6 +307,9 @@
 	
 	  alien: function alien(game, x, y) {
 	    return new _Alien2.default(game, x, y, ALIEN);
+	  },
+	  brick: function brickSprite(game, x, y) {
+	    return new _BrickSprite2.default(game, x, y, BRICK);
 	  }
 	};
 
@@ -591,11 +607,45 @@
 
 /***/ },
 /* 8 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Bricksprite = function (_Phaser$Sprite) {
+	  _inherits(Bricksprite, _Phaser$Sprite);
+	
+	  function Bricksprite(game, x, y, key) {
+	    _classCallCheck(this, Bricksprite);
+	
+	    var _this = _possibleConstructorReturn(this, (Bricksprite.__proto__ || Object.getPrototypeOf(Bricksprite)).call(this, game, x, y, key));
+	
+	    game.physics.enable(_this);
+	    _this.body.immovable = true;
+	    return _this;
+	  }
+	
+	  return Bricksprite;
+	}(Phaser.Sprite);
+	
+	exports.default = Bricksprite;
+
+/***/ },
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var _BitmapFont = __webpack_require__(9);
+	var _BitmapFont = __webpack_require__(10);
 	
 	var _BitmapFont2 = _interopRequireDefault(_BitmapFont);
 	
@@ -630,7 +680,7 @@
 	};
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -692,7 +742,7 @@
 	exports.default = BitmapFont;
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -707,7 +757,7 @@
 	
 	var _State4 = _interopRequireDefault(_State3);
 	
-	var _display_objects = __webpack_require__(8);
+	var _display_objects = __webpack_require__(9);
 	
 	var _display_objects2 = _interopRequireDefault(_display_objects);
 	
@@ -774,7 +824,7 @@
 	exports.default = Loading;
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -789,7 +839,7 @@
 	
 	var _State4 = _interopRequireDefault(_State3);
 	
-	var _display_objects = __webpack_require__(8);
+	var _display_objects = __webpack_require__(9);
 	
 	var _display_objects2 = _interopRequireDefault(_display_objects);
 	
