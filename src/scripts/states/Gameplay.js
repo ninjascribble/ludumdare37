@@ -7,13 +7,34 @@ export default class Gameplay extends _State {
     this.stage.backgroundColor = '#223344';
     this.world.setBounds(0, 0, this.world.width, this.world.height);
     this.player = GameObjects.player(game, this.world.centerX, 60);
-    this.bricks = GameObjects.bricks(game);
-    this.enemies = GameObjects.enemies(game);
 
-    this.add.existing(this.titleText());
+    this.bricks = GameObjects.bricks(game);
+    this.book = GameObjects.book(game, this.world.centerX, 90);
+    this.brick = GameObjects.brick(game, this.world.centerX, 90);
+    this.solarMeter = GameObjects.solarMeter(game);
+    this.enemies = GameObjects.enemies(game);
+    this.enemies.setSpawnPoints([
+      { x: -16, y: -16 },
+      { x: -16, y: this.world.centerY },
+      { x: -16, y: this.world.height + 16 },
+      { x: this.world.width + 16, y: -16 },
+      { x: this.world.width + 16, y: this.world.centerY },
+      { x: this.world.width + 16, y: this.world.height + 16 },
+      { x: -16, y: -16 },
+      { x: this.world.centerX, y: -16 },
+      { x: this.world.with + 16, y: -16 },
+      { x: -16, y: this.world.height + 16 },
+      { x: this.world.centerX, y: this.world.height + 16 },
+      { x: this.world.with + 16, y: this.world.height + 16 }
+    ]);
+
+
+    this.add.existing(this.bricks);
+    this.add.existing(this.brick);
+    this.add.existing(this.book);
     this.add.existing(this.player);
     this.add.existing(this.enemies);
-    this.add.existing(this.bricks);
+    this.add.existing(this.solarMeter);
 
     this.bricks.addBrick(144, 128);
     this.bricks.addBrick(160, 128);
@@ -26,28 +47,22 @@ export default class Gameplay extends _State {
     this.bricks.addBrick(176, 160);
 
 
+    this.enemies.startMoveTimer();
+    this.enemies.startSpawnTimer();
+    this.solarMeter.draining();
 
-    this.enemies.spawnAlien(64, 64);
-    this.enemies.spawnAlien(64, this.world.height / 2);
-    this.enemies.spawnAlien(64, this.world.height - 64);
-    this.enemies.spawnAlien(this.world.width / 2, 64);
-    this.enemies.spawnAlien(this.world.width / 2, this.world.height / 2);
-    this.enemies.spawnAlien(this.world.width / 2, this.world.height - 64);
-    this.enemies.spawnAlien(this.world.width - 64, 64);
-    this.enemies.spawnAlien(this.world.width - 64, this.world.height / 2);
-    this.enemies.spawnAlien(this.world.width - 64, this.world.height - 64);
+    this.solarMeter.onStartDraining.add(() => {
+      this.book.close();
+    }, this);
 
-    this.enemies.moveTimer();
-  }
-
-  titleText () {
-    return DisplayObjects.displayFont(game, 'THIS IS THE GAME', this.world.centerX, 40, 'center');
+    this.solarMeter.onStartCharging.add(() => {
+      this.book.open();
+    }, this);
   }
 
   update () {
-    this.game.physics.arcade.collide(this.player, this.enemies);
+    this.game.physics.arcade.overlap(this.player, this.enemies, this.onPlayerEnemyCollide);
     this.game.physics.arcade.collide(this.enemies, this.enemies);
-    this.game.physics.arcade.collide(this.brick, this.player);
     this.game.physics.arcade.collide(this.brick, this.enemies);
 
     if (this.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
@@ -65,5 +80,21 @@ export default class Gameplay extends _State {
     if (this.input.keyboard.isDown(Phaser.Keyboard.DOWN)) {
       this.player.moveDown();
     }
+
+    if (this.player.overlap(this.brick)) {
+      this.solarMeter.charging();
+    } else {
+      this.solarMeter.draining();
+    }
+
+    if (this.solarMeter.health <= 0) {
+      this.stateProvider.gameover(this.state);
+    }
+  }
+
+  onPlayerEnemyCollide (player, enemy) {
+    enemy.body.velocity.x = 0;
+    enemy.body.velocity.y = 0;
+    setTimeout(() => enemy.kill(), 100);
   }
 }

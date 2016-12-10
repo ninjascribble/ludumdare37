@@ -1,3 +1,6 @@
+const MOVE_DELAY = 500;
+const SPAWN_DELAY = 200;
+
 export default class Enemies extends Phaser.Group {
   constructor (game, parent, name) {
     super(game, parent, name);
@@ -7,33 +10,43 @@ export default class Enemies extends Phaser.Group {
     this.alienBuilder = builder;
   }
 
-  moveTimer () {
-    const moveDelay = this.game.time.create();
-
-    this.children.forEach((enemy) => {
-      moveDelay.loop(500, () => this.travel(enemy), this);
-      moveDelay.start();
-    });
+  setSpawnPoints (spawnPoints) {
+    this.spawnPoints = spawnPoints;
   }
 
-  spawnAlien (x, y) {
-    const alien = this.alienBuilder(game, x, y)
+  startMoveTimer () {
+    const timer = this.game.time.create();
 
-    this.add(alien)
+    timer.loop(MOVE_DELAY, () => {
+      this.children.forEach((enemy) => enemy.travel());
+    }, this);
+    timer.start();
   }
 
-  travel (enemy) {
-    const dirNum = this.game.rnd.integerInRange(1, 4);
+  startSpawnTimer () {
+    const timer = this.game.time.create();
 
-    switch (dirNum) {
-      case 1: enemy.moveLeft(this.obstacles);
-        break;
-      case 2: enemy.moveRight(this.obstacles);
-        break;
-      case 3: enemy.moveUp(this.obstacles);
-        break;
-      case 4: enemy.moveDown(this.obstacles);
-        break;
+    timer.loop(SPAWN_DELAY, () => this.spawnAlien(), this);
+    timer.start();
+  }
+
+  spawnAlien () {
+    const spawnPoint = this.game.rnd.pick(this.spawnPoints);
+
+    this.spawnAlienAt(spawnPoint.x, spawnPoint.y);
+  }
+
+  spawnAlienAt (x, y) {
+    if (this.countLiving() > 500) {
+      return;
     }
+
+    const alien = this.getFirstDead() || this.alienBuilder(game);
+
+    alien.x = x;
+    alien.y = y;
+    alien.body.collideWorldBounds = false;
+    alien.revive()
+    this.add(alien)
   }
 }
