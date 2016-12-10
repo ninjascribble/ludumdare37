@@ -1,14 +1,14 @@
 import Player from './Player';
 import Enemies from './Enemies';
 import Alien from './Alien';
+import SolarMeter from './SolarMeter';
 import BrickSprite from './BrickSprite'; //importing the bricksprite class
-
 
 const PLAYER = 'player';
 const ENEMIES = 'enemies';
+const SOLAR_METER = 'solar_meter';
 const ALIEN = 'alien';
 const BRICK = 'brick';
-
 
 module.exports = {
   load: function load (loader) {
@@ -32,7 +32,12 @@ module.exports = {
   alien: function alien (game, x, y) {
     return new Alien(game, x, y, ALIEN);
   },
+
   brick: function brickSprite (game, x, y) {
     return new BrickSprite(game, x, y, BRICK);
+  },
+
+  solarMeter: function solarMeter (game, parent) {
+    return new SolarMeter(game, parent, SOLAR_METER)
   }
 };

@@ -78,11 +78,11 @@
 	
 	var _Gameplay2 = _interopRequireDefault(_Gameplay);
 	
-	var _Loading = __webpack_require__(11);
+	var _Loading = __webpack_require__(12);
 	
 	var _Loading2 = _interopRequireDefault(_Loading);
 	
-	var _Menu = __webpack_require__(12);
+	var _Menu = __webpack_require__(13);
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
@@ -166,28 +166,25 @@
 	      this.world.setBounds(0, 0, this.world.width, this.world.height);
 	      this.player = _game_objects2.default.player(game, this.world.centerX, 60);
 	      this.brick = _game_objects2.default.brick(game, this.world.centerX, 90);
+	      this.solarMeter = _game_objects2.default.solarMeter(game);
 	      this.enemies = _game_objects2.default.enemies(game);
 	      this.enemies.setSpawnPoints([{ x: -16, y: -16 }, { x: -16, y: this.world.centerY }, { x: -16, y: this.world.height + 16 }, { x: this.world.width + 16, y: -16 }, { x: this.world.width + 16, y: this.world.centerY }, { x: this.world.width + 16, y: this.world.height + 16 }, { x: -16, y: -16 }, { x: this.world.centerX, y: -16 }, { x: this.world.with + 16, y: -16 }, { x: -16, y: this.world.height + 16 }, { x: this.world.centerX, y: this.world.height + 16 }, { x: this.world.with + 16, y: this.world.height + 16 }]);
 	
-	      this.add.existing(this.titleText());
 	      this.add.existing(this.brick);
 	      this.add.existing(this.player);
 	      this.add.existing(this.enemies);
+	      this.add.existing(this.solarMeter);
 	
 	      this.enemies.startMoveTimer();
 	      this.enemies.startSpawnTimer();
-	    }
-	  }, {
-	    key: 'titleText',
-	    value: function titleText() {
-	      return _display_objects2.default.displayFont(game, 'THIS IS THE GAME', this.world.centerX, 40, 'center');
+	      this.solarMeter.draining();
 	    }
 	  }, {
 	    key: 'update',
 	    value: function update() {
 	      this.game.physics.arcade.overlap(this.player, this.enemies, this.onPlayerEnemyCollide);
 	      this.game.physics.arcade.collide(this.enemies, this.enemies);
-	      this.game.physics.arcade.collide(this.brick, this.player);
+	      // this.game.physics.arcade.overlap(this.brick, this.player);
 	      this.game.physics.arcade.collide(this.brick, this.enemies);
 	
 	      if (this.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
@@ -204,6 +201,12 @@
 	
 	      if (this.input.keyboard.isDown(Phaser.Keyboard.DOWN)) {
 	        this.player.moveDown();
+	      }
+	
+	      if (this.player.overlap(this.brick)) {
+	        this.solarMeter.charging();
+	      } else {
+	        this.solarMeter.draining();
 	      }
 	    }
 	  }, {
@@ -269,7 +272,11 @@
 	
 	var _Alien2 = _interopRequireDefault(_Alien);
 	
-	var _BrickSprite = __webpack_require__(8);
+	var _SolarMeter = __webpack_require__(8);
+	
+	var _SolarMeter2 = _interopRequireDefault(_SolarMeter);
+	
+	var _BrickSprite = __webpack_require__(11);
 	
 	var _BrickSprite2 = _interopRequireDefault(_BrickSprite);
 	
@@ -277,9 +284,9 @@
 	
 	//importing the bricksprite class
 	
-	
 	var PLAYER = 'player';
 	var ENEMIES = 'enemies';
+	var SOLAR_METER = 'solar_meter';
 	var ALIEN = 'alien';
 	var BRICK = 'brick';
 	
@@ -305,8 +312,13 @@
 	  alien: function alien(game, x, y) {
 	    return new _Alien2.default(game, x, y, ALIEN);
 	  },
+	
 	  brick: function brickSprite(game, x, y) {
 	    return new _BrickSprite2.default(game, x, y, BRICK);
+	  },
+	
+	  solarMeter: function solarMeter(game, parent) {
+	    return new _SolarMeter2.default(game, parent, SOLAR_METER);
 	  }
 	};
 
@@ -639,13 +651,21 @@
 
 /***/ },
 /* 8 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _display_objects = __webpack_require__(9);
+	
+	var _display_objects2 = _interopRequireDefault(_display_objects);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -653,23 +673,82 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var Bricksprite = function (_Phaser$Sprite) {
-	  _inherits(Bricksprite, _Phaser$Sprite);
+	var MAX_HEALTH = 100;
+	var MIN_HEALTH = 0;
+	var CHARGE_DELAY = 200;
+	var DRAIN_DELAY = 500;
+	var STATE_DRAINING = 'draining';
+	var STATE_CHARGING = 'charging';
 	
-	  function Bricksprite(game, x, y, key) {
-	    _classCallCheck(this, Bricksprite);
+	var SolarMeter = function (_Phaser$Group) {
+	  _inherits(SolarMeter, _Phaser$Group);
 	
-	    var _this = _possibleConstructorReturn(this, (Bricksprite.__proto__ || Object.getPrototypeOf(Bricksprite)).call(this, game, x, y, key));
+	  function SolarMeter(game, parent, name) {
+	    _classCallCheck(this, SolarMeter);
 	
-	    game.physics.enable(_this);
-	    _this.body.immovable = true;
+	    var _this = _possibleConstructorReturn(this, (SolarMeter.__proto__ || Object.getPrototypeOf(SolarMeter)).call(this, game, parent, name));
+	
+	    _this.health = MAX_HEALTH;
+	
+	    _this.drainTimer = _this.game.time.create();
+	    _this.drainTimer.loop(DRAIN_DELAY, function () {
+	      return _this.drain();
+	    }, _this);
+	
+	    _this.chargeTimer = _this.game.time.create();
+	    _this.chargeTimer.loop(CHARGE_DELAY, function () {
+	      return _this.charge();
+	    }, _this);
+	
+	    _this.hud = _display_objects2.default.bodyFont(_this.game, _this.health, 16, 16);
+	
+	    _this.add(_this.hud);
 	    return _this;
 	  }
 	
-	  return Bricksprite;
-	}(Phaser.Sprite);
+	  _createClass(SolarMeter, [{
+	    key: 'draining',
+	    value: function draining() {
+	      if (this.state !== STATE_DRAINING) {
+	        this.chargeTimer.stop(false);
+	        this.drainTimer.start();
+	        this.state = STATE_DRAINING;
+	      }
+	    }
+	  }, {
+	    key: 'charging',
+	    value: function charging() {
+	      if (this.state !== STATE_CHARGING) {
+	        this.drainTimer.stop(false);
+	        this.chargeTimer.start();
+	        this.state = STATE_CHARGING;
+	      }
+	    }
+	  }, {
+	    key: 'drain',
+	    value: function drain() {
+	      if (this.health > MIN_HEALTH) {
+	        this.health--;
+	      }
+	    }
+	  }, {
+	    key: 'charge',
+	    value: function charge() {
+	      if (this.health < MAX_HEALTH) {
+	        this.health++;
+	      }
+	    }
+	  }, {
+	    key: 'update',
+	    value: function update() {
+	      this.hud.text = this.health;
+	    }
+	  }]);
 	
-	exports.default = Bricksprite;
+	  return SolarMeter;
+	}(Phaser.Group);
+	
+	exports.default = SolarMeter;
 
 /***/ },
 /* 9 */
@@ -775,6 +854,40 @@
 
 /***/ },
 /* 11 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Bricksprite = function (_Phaser$Sprite) {
+	  _inherits(Bricksprite, _Phaser$Sprite);
+	
+	  function Bricksprite(game, x, y, key) {
+	    _classCallCheck(this, Bricksprite);
+	
+	    var _this = _possibleConstructorReturn(this, (Bricksprite.__proto__ || Object.getPrototypeOf(Bricksprite)).call(this, game, x, y, key));
+	
+	    game.physics.enable(_this);
+	    _this.body.immovable = true;
+	    return _this;
+	  }
+	
+	  return Bricksprite;
+	}(Phaser.Sprite);
+	
+	exports.default = Bricksprite;
+
+/***/ },
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -856,7 +969,7 @@
 	exports.default = Loading;
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

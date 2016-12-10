@@ -8,6 +8,7 @@ export default class Gameplay extends _State {
     this.world.setBounds(0, 0, this.world.width, this.world.height);
     this.player = GameObjects.player(game, this.world.centerX, 60);
     this.brick = GameObjects.brick(game, this.world.centerX, 90);
+    this.solarMeter = GameObjects.solarMeter(game);
     this.enemies = GameObjects.enemies(game);
     this.enemies.setSpawnPoints([
       { x: -16, y: -16 },
@@ -24,23 +25,20 @@ export default class Gameplay extends _State {
       { x: this.world.with + 16, y: this.world.height + 16 }
     ]);
 
-    this.add.existing(this.titleText());
     this.add.existing(this.brick);
     this.add.existing(this.player);
     this.add.existing(this.enemies);
+    this.add.existing(this.solarMeter);
 
     this.enemies.startMoveTimer();
     this.enemies.startSpawnTimer();
-  }
-
-  titleText () {
-    return DisplayObjects.displayFont(game, 'THIS IS THE GAME', this.world.centerX, 40, 'center');
+    this.solarMeter.draining();
   }
 
   update () {
     this.game.physics.arcade.overlap(this.player, this.enemies, this.onPlayerEnemyCollide);
     this.game.physics.arcade.collide(this.enemies, this.enemies);
-    this.game.physics.arcade.collide(this.brick, this.player);
+    // this.game.physics.arcade.overlap(this.brick, this.player);
     this.game.physics.arcade.collide(this.brick, this.enemies);
 
     if (this.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
@@ -57,6 +55,12 @@ export default class Gameplay extends _State {
 
     if (this.input.keyboard.isDown(Phaser.Keyboard.DOWN)) {
       this.player.moveDown();
+    }
+
+    if (this.player.overlap(this.brick)) {
+      this.solarMeter.charging();
+    } else {
+      this.solarMeter.draining();
     }
   }
 
