@@ -78,15 +78,15 @@
 	
 	var _Gameplay2 = _interopRequireDefault(_Gameplay);
 	
-	var _Gameover = __webpack_require__(13);
+	var _Gameover = __webpack_require__(14);
 	
 	var _Gameover2 = _interopRequireDefault(_Gameover);
 	
-	var _Loading = __webpack_require__(14);
+	var _Loading = __webpack_require__(15);
 	
 	var _Loading2 = _interopRequireDefault(_Loading);
 	
-	var _Menu = __webpack_require__(15);
+	var _Menu = __webpack_require__(16);
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
@@ -175,17 +175,30 @@
 	      this.stage.backgroundColor = '#223344';
 	      this.world.setBounds(0, 0, this.world.width, this.world.height);
 	      this.player = _game_objects2.default.player(game, this.world.centerX, 60);
+	
+	      this.bricks = _game_objects2.default.bricks(game);
 	      this.book = _game_objects2.default.book(game, this.world.centerX, 90);
 	      this.brick = _game_objects2.default.brick(game, this.world.centerX, 90);
 	      this.solarMeter = _game_objects2.default.solarMeter(game);
 	      this.enemies = _game_objects2.default.enemies(game);
 	      this.enemies.setSpawnPoints([{ x: -16, y: -16 }, { x: -16, y: this.world.centerY }, { x: -16, y: this.world.height + 16 }, { x: this.world.width + 16, y: -16 }, { x: this.world.width + 16, y: this.world.centerY }, { x: this.world.width + 16, y: this.world.height + 16 }, { x: -16, y: -16 }, { x: this.world.centerX, y: -16 }, { x: this.world.with + 16, y: -16 }, { x: -16, y: this.world.height + 16 }, { x: this.world.centerX, y: this.world.height + 16 }, { x: this.world.with + 16, y: this.world.height + 16 }]);
 	
+	      this.add.existing(this.bricks);
 	      this.add.existing(this.brick);
 	      this.add.existing(this.book);
 	      this.add.existing(this.player);
 	      this.add.existing(this.enemies);
 	      this.add.existing(this.solarMeter);
+	
+	      this.bricks.addBrick(144, 128);
+	      this.bricks.addBrick(160, 128);
+	      this.bricks.addBrick(176, 128);
+	      this.bricks.addBrick(144, 144);
+	      this.bricks.addBrick(160, 144);
+	      this.bricks.addBrick(176, 144);
+	      this.bricks.addBrick(144, 160);
+	      this.bricks.addBrick(160, 160);
+	      this.bricks.addBrick(176, 160);
 	
 	      this.enemies.startMoveTimer();
 	      this.enemies.startSpawnTimer();
@@ -307,18 +320,24 @@
 	
 	var _BrickSprite2 = _interopRequireDefault(_BrickSprite);
 	
-	var _Book = __webpack_require__(12);
+	var _Bricks = __webpack_require__(12);
+	
+	var _Bricks2 = _interopRequireDefault(_Bricks);
+	
+	var _Book = __webpack_require__(13);
 	
 	var _Book2 = _interopRequireDefault(_Book);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var PLAYER = 'player'; //importing the bricksprite class
+	//importing the bricksprite class
 	
+	var PLAYER = 'player';
 	var ENEMIES = 'enemies';
 	var SOLAR_METER = 'solar_meter';
 	var ALIEN = 'alien';
 	var BRICK = 'brick';
+	var BRICKS = 'bricks';
 	var BOOK = 'book';
 	
 	module.exports = {
@@ -331,6 +350,13 @@
 	
 	  player: function player(game, x, y) {
 	    return new _Player2.default(game, x, y, PLAYER);
+	  },
+	
+	  bricks: function bricks(game, parent) {
+	    var group = new _Bricks2.default(game, parent, BRICKS);
+	    group.setBrickBuilder(module.exports.brick);
+	
+	    return group;
 	  },
 	
 	  enemies: function enemies(game, parent) {
@@ -931,6 +957,61 @@
 /* 12 */
 /***/ function(module, exports) {
 
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Bricksprite = function (_Phaser$Group) {
+	  _inherits(Bricksprite, _Phaser$Group);
+	
+	  function Bricksprite(game, parent, name) {
+	    _classCallCheck(this, Bricksprite);
+	
+	    return _possibleConstructorReturn(this, (Bricksprite.__proto__ || Object.getPrototypeOf(Bricksprite)).call(this, game, parent, name));
+	  }
+	
+	  _createClass(Bricksprite, [{
+	    key: "setBrickBuilder",
+	    value: function setBrickBuilder(builder) {
+	      this.brickBuilder = builder;
+	    }
+	  }, {
+	    key: "addBrick",
+	    value: function addBrick(x, y) {
+	      var brick = this.brickBuilder(game, x, y);
+	
+	      this.add(brick);
+	    }
+	    /*onCollide(){
+	      super.onCollide();
+	      if(!this.body.immovable){
+	      // this.game.sound.play('brickImpact');
+	      }
+	       this.body.immovable = true;
+	      this.onDone.dispatch();
+	    }*/
+	
+	  }]);
+	
+	  return Bricksprite;
+	}(Phaser.Group);
+	
+	exports.default = Bricksprite;
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
@@ -978,7 +1059,7 @@
 	exports.default = Book;
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1051,7 +1132,7 @@
 	exports.default = Gameover;
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1133,7 +1214,7 @@
 	exports.default = Loading;
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
