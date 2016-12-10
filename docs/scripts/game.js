@@ -184,7 +184,6 @@
 	    value: function update() {
 	      this.game.physics.arcade.overlap(this.player, this.enemies, this.onPlayerEnemyCollide);
 	      this.game.physics.arcade.collide(this.enemies, this.enemies);
-	      // this.game.physics.arcade.overlap(this.brick, this.player);
 	      this.game.physics.arcade.collide(this.brick, this.enemies);
 	
 	      if (this.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
@@ -212,7 +211,11 @@
 	  }, {
 	    key: 'onPlayerEnemyCollide',
 	    value: function onPlayerEnemyCollide(player, enemy) {
-	      enemy.kill();
+	      enemy.body.velocity.x = 0;
+	      enemy.body.velocity.y = 0;
+	      setTimeout(function () {
+	        return enemy.kill();
+	      }, 100);
 	    }
 	  }]);
 	
