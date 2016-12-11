@@ -4,14 +4,13 @@ import DisplayObjects from '../display_objects';
 
 export default class Gameplay extends _State {
   create () {
-    this.stage.backgroundColor = '#223344';
+    this.stage.backgroundColor = '#a3ce27';
     this.world.setBounds(0, 0, this.world.width, this.world.height);
     this.player = GameObjects.player(game, this.world.centerX, 60);
-
-    this.room = GameObjects.room(game);
-    this.book = GameObjects.book(game, 160, 144);
     this.solarMeter = GameObjects.solarMeter(game);
     this.enemies = GameObjects.enemies(game);
+    this.book = GameObjects.book(game, 152, 124);
+    this.room = GameObjects.room(game, 120, 104);
     this.enemies.setTarget(this.book);
     this.enemies.setSpawnPoints([
       { x: -16, y: -16 },
@@ -30,9 +29,12 @@ export default class Gameplay extends _State {
 
     this.add.existing(this.room);
     this.add.existing(this.book);
-    this.add.existing(this.player);
     this.add.existing(this.enemies);
+    this.add.existing(this.player);
     this.add.existing(this.solarMeter);
+
+    this.game.world.bringToTop(this.enemies);
+    this.game.world.bringToTop(this.solarMeter);
 
     this.enemies.startMoveTimer();
     this.enemies.startSpawnTimer();

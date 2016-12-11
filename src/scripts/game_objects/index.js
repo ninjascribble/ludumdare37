@@ -21,17 +21,15 @@ module.exports = {
     loader.load.spritesheet(ALIEN, 'alien.png', 16, 16);
     loader.load.spritesheet(BRICK, 'brick.png', 16, 16);
     loader.load.spritesheet(BOOK, 'book.png', 16, 16);
+    loader.load.spritesheet(ROOM, 'room.png', 80, 80);
   },
 
   player: function player (game, x, y) {
     return new Player(game, x, y, PLAYER);
   },
 
-  room: function room(game, parent){
-    const group = new Room(game, parent, ROOM);
-    group.setBrickBuilder(module.exports.brick);
-    group.buildAll();
-    return group;
+  room: function room(game, x, y){
+    return new Room(game, x, y, ROOM);
   },
 
   enemies: function enemies (game, parent) {
