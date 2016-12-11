@@ -17,10 +17,10 @@ const BOOK = 'book';
 
 module.exports = {
   load: function load (loader) {
-    loader.load.spritesheet(PLAYER, 'assets/player.png', 16, 16);
-    loader.load.spritesheet(ALIEN, 'assets/alien.png', 16, 16);
-    loader.load.spritesheet(BRICK, 'assets/brick.png', 16, 16);
-    loader.load.spritesheet(BOOK, 'assets/book.png', 16, 16);
+    loader.load.spritesheet(PLAYER, 'player.png', 16, 16);
+    loader.load.spritesheet(ALIEN, 'alien.png', 16, 16);
+    loader.load.spritesheet(BRICK, 'brick.png', 16, 16);
+    loader.load.spritesheet(BOOK, 'book.png', 16, 16);
   },
 
   player: function player (game, x, y) {
