@@ -728,7 +728,7 @@
 	      var yDiff = 144 - this.y;
 	
 	      //If the enemy isn't next to the book then procede with movement
-	      if (Math.abs(xDiff) > 16 && Math.abs(yDiff) > 16) {
+	      if (Math.abs(xDiff) > 16 || Math.abs(yDiff) > 16) {
 	        if (randNum > 40) {
 	          this.moveToBook(xDiff, yDiff);
 	        } else {
