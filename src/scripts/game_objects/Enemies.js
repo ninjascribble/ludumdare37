@@ -23,7 +23,7 @@ export default class Enemies extends Phaser.Group {
     const timer = this.game.time.create();
 
     timer.loop(MOVE_DELAY, () => {
-      this.children.forEach((enemy) => enemy.travel());
+      this.children.forEach((enemy) => enemy.determineMovement());
     }, this);
     timer.start();
   }
