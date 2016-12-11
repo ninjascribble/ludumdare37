@@ -13,6 +13,7 @@ export default class Gameplay extends _State {
     this.player = GameObjects.player(game, this.world.centerX, 60);
     this.solarMeter = GameObjects.solarMeter(game);
     this.enemies = GameObjects.enemies(game);
+    this.explosions = GameObjects.explosions(game);
     this.spells = GameObjects.spells(game);
     this.book = GameObjects.book(game, 152, 124);
     this.room = GameObjects.room(game, 120, 104);
@@ -43,11 +44,13 @@ export default class Gameplay extends _State {
     this.add.existing(this.room);
     this.add.existing(this.book);
     this.add.existing(this.enemies);
+    this.add.existing(this.explosions);
     this.add.existing(this.player);
     this.add.existing(this.solarMeter);
     this.add.existing(this.spells);
 
     this.game.world.bringToTop(this.enemies);
+    this.game.world.bringToTop(this.explosions);
     this.game.world.bringToTop(this.spells);
     this.game.world.bringToTop(this.solarMeter);
 
@@ -120,6 +123,7 @@ export default class Gameplay extends _State {
 
   onSpellEnemyCollide (spell, enemy) {
     this.game.scores.enemiesKilled++;
+    this.explosions.spawnExplosionAt(enemy.x, enemy.y);
     enemy.kill();
   }
 }

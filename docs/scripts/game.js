@@ -78,19 +78,19 @@
 	
 	var _Gameplay2 = _interopRequireDefault(_Gameplay);
 	
-	var _Gameover = __webpack_require__(19);
+	var _Gameover = __webpack_require__(21);
 	
 	var _Gameover2 = _interopRequireDefault(_Gameover);
 	
-	var _Loading = __webpack_require__(20);
+	var _Loading = __webpack_require__(22);
 	
 	var _Loading2 = _interopRequireDefault(_Loading);
 	
-	var _Menu = __webpack_require__(21);
+	var _Menu = __webpack_require__(23);
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
-	var _Story = __webpack_require__(22);
+	var _Story = __webpack_require__(24);
 	
 	var _Story2 = _interopRequireDefault(_Story);
 	
@@ -158,11 +158,11 @@
 	
 	var _display_objects2 = _interopRequireDefault(_display_objects);
 	
-	var _sounds = __webpack_require__(17);
+	var _sounds = __webpack_require__(19);
 	
 	var _sounds2 = _interopRequireDefault(_sounds);
 	
-	__webpack_require__(18);
+	__webpack_require__(20);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -193,6 +193,7 @@
 	      this.player = _game_objects2.default.player(game, this.world.centerX, 60);
 	      this.solarMeter = _game_objects2.default.solarMeter(game);
 	      this.enemies = _game_objects2.default.enemies(game);
+	      this.explosions = _game_objects2.default.explosions(game);
 	      this.spells = _game_objects2.default.spells(game);
 	      this.book = _game_objects2.default.book(game, 152, 124);
 	      this.room = _game_objects2.default.room(game, 120, 104);
@@ -211,11 +212,13 @@
 	      this.add.existing(this.room);
 	      this.add.existing(this.book);
 	      this.add.existing(this.enemies);
+	      this.add.existing(this.explosions);
 	      this.add.existing(this.player);
 	      this.add.existing(this.solarMeter);
 	      this.add.existing(this.spells);
 	
 	      this.game.world.bringToTop(this.enemies);
+	      this.game.world.bringToTop(this.explosions);
 	      this.game.world.bringToTop(this.spells);
 	      this.game.world.bringToTop(this.solarMeter);
 	
@@ -290,6 +293,7 @@
 	    key: 'onSpellEnemyCollide',
 	    value: function onSpellEnemyCollide(spell, enemy) {
 	      this.game.scores.enemiesKilled++;
+	      this.explosions.spawnExplosionAt(enemy.x, enemy.y);
 	      enemy.kill();
 	    }
 	  }]);
@@ -378,6 +382,14 @@
 	
 	var _Grass2 = _interopRequireDefault(_Grass);
 	
+	var _Explosion = __webpack_require__(17);
+	
+	var _Explosion2 = _interopRequireDefault(_Explosion);
+	
+	var _Explosions = __webpack_require__(18);
+	
+	var _Explosions2 = _interopRequireDefault(_Explosions);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var PLAYER = 'player'; //importing the bricksprite class
@@ -391,6 +403,8 @@
 	var SPELL = 'spell';
 	var SPELLS = 'spells';
 	var GRASS = 'grass';
+	var EXPLOSION = 'explosion';
+	var EXPLOSIONS = 'explosions';
 	
 	module.exports = {
 	  load: function load(loader) {
@@ -401,6 +415,7 @@
 	    loader.load.spritesheet(ROOM, 'room.png', 80, 80);
 	    loader.load.spritesheet(SPELL, 'spell.png', 16, 48);
 	    loader.load.spritesheet(GRASS, 'grass.png', 320, 288);
+	    loader.load.spritesheet(EXPLOSION, 'explosion.png', 16, 16);
 	  },
 	
 	  enemies: function enemies(game, parent) {
@@ -412,6 +427,12 @@
 	  spells: function enemies(game, parent) {
 	    var group = new _Spells2.default(game, parent, SPELLS);
 	    group.setSpellBuilder(module.exports.spell);
+	    return group;
+	  },
+	
+	  explosions: function explosions(game, parent) {
+	    var group = new _Explosions2.default(game, parent, EXPLOSIONS);
+	    group.setExplosionBuilder(module.exports.explosion);
 	    return group;
 	  },
 	
@@ -445,6 +466,10 @@
 	
 	  grass: function grass(game, x, y) {
 	    return new _Grass2.default(game, x, y, GRASS);
+	  },
+	
+	  explosion: function explosion(game, x, y) {
+	    return new _Explosion2.default(game, x, y, EXPLOSION);
 	  }
 	};
 
@@ -1396,6 +1421,98 @@
 
 	'use strict';
 	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Explosion = function (_Phaser$Sprite) {
+	  _inherits(Explosion, _Phaser$Sprite);
+	
+	  function Explosion(game, x, y, key) {
+	    _classCallCheck(this, Explosion);
+	
+	    var _this = _possibleConstructorReturn(this, (Explosion.__proto__ || Object.getPrototypeOf(Explosion)).call(this, game, x, y, key));
+	
+	    _this.animations.add('explode', [0, 1, 2], 12, false);
+	    return _this;
+	  }
+	
+	  _createClass(Explosion, [{
+	    key: 'explode',
+	    value: function explode() {
+	      this.animations.play('explode', null, false, true);
+	    }
+	  }]);
+	
+	  return Explosion;
+	}(Phaser.Sprite);
+	
+	exports.default = Explosion;
+
+/***/ },
+/* 18 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Explosions = function (_Phaser$Group) {
+	  _inherits(Explosions, _Phaser$Group);
+	
+	  function Explosions(game, parent, name) {
+	    _classCallCheck(this, Explosions);
+	
+	    return _possibleConstructorReturn(this, (Explosions.__proto__ || Object.getPrototypeOf(Explosions)).call(this, game, parent, name));
+	  }
+	
+	  _createClass(Explosions, [{
+	    key: "setExplosionBuilder",
+	    value: function setExplosionBuilder(builder) {
+	      this.explosionBuilder = builder;
+	    }
+	  }, {
+	    key: "spawnExplosionAt",
+	    value: function spawnExplosionAt(x, y) {
+	      var spawn = this.getFirstDead() || this.explosionBuilder(game);
+	
+	      spawn.x = x;
+	      spawn.y = y;
+	      spawn.revive();
+	      this.add(spawn);
+	      spawn.explode();
+	    }
+	  }]);
+	
+	  return Explosions;
+	}(Phaser.Group);
+	
+	exports.default = Explosions;
+
+/***/ },
+/* 19 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
 	var SPELL = 'spell';
 	
 	module.exports = {
@@ -1409,7 +1526,7 @@
 	};
 
 /***/ },
-/* 18 */
+/* 20 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1442,7 +1559,7 @@
 	});
 
 /***/ },
-/* 19 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1465,7 +1582,7 @@
 	
 	var _game_objects2 = _interopRequireDefault(_game_objects);
 	
-	__webpack_require__(18);
+	__webpack_require__(20);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -1545,7 +1662,7 @@
 	exports.default = Gameover;
 
 /***/ },
-/* 20 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1568,7 +1685,7 @@
 	
 	var _game_objects2 = _interopRequireDefault(_game_objects);
 	
-	var _sounds = __webpack_require__(17);
+	var _sounds = __webpack_require__(19);
 	
 	var _sounds2 = _interopRequireDefault(_sounds);
 	
@@ -1631,7 +1748,7 @@
 	exports.default = Loading;
 
 /***/ },
-/* 21 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1727,7 +1844,7 @@
 	exports.default = Menu;
 
 /***/ },
-/* 22 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

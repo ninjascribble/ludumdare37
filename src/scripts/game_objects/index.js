@@ -8,6 +8,8 @@ import BrickSprite from './BrickSprite'; //importing the bricksprite class
 import Room from './Room';
 import Book from './Book';
 import Grass from './Grass';
+import Explosion from './Explosion';
+import Explosions from './Explosions';
 
 const PLAYER = 'player';
 const ENEMIES = 'enemies';
@@ -19,6 +21,8 @@ const BOOK = 'book';
 const SPELL = 'spell';
 const SPELLS = 'spells';
 const GRASS = 'grass';
+const EXPLOSION = 'explosion';
+const EXPLOSIONS = 'explosions';
 
 module.exports = {
   load: function load (loader) {
@@ -29,6 +33,7 @@ module.exports = {
     loader.load.spritesheet(ROOM, 'room.png', 80, 80);
     loader.load.spritesheet(SPELL, 'spell.png', 16, 48);
     loader.load.spritesheet(GRASS, 'grass.png', 320, 288);
+    loader.load.spritesheet(EXPLOSION, 'explosion.png',16, 16);
   },
 
   enemies: function enemies (game, parent) {
@@ -40,6 +45,12 @@ module.exports = {
   spells: function enemies (game, parent) {
     const group = new Spells(game, parent, SPELLS);
     group.setSpellBuilder(module.exports.spell);
+    return group;
+  },
+
+  explosions: function explosions (game, parent) {
+    const group = new Explosions(game, parent, EXPLOSIONS);
+    group.setExplosionBuilder(module.exports.explosion);
     return group;
   },
 
@@ -73,5 +84,9 @@ module.exports = {
 
   grass: function grass (game, x, y) {
     return new Grass(game, x, y, GRASS);
+  },
+
+  explosion: function explosion (game, x, y) {
+    return new Explosion(game, x, y, EXPLOSION);
   }
 };
