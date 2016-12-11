@@ -335,10 +335,10 @@
 	
 	module.exports = {
 	  load: function load(loader) {
-	    loader.load.spritesheet(PLAYER, 'assets/player.png', 16, 16);
-	    loader.load.spritesheet(ALIEN, 'assets/alien.png', 16, 16);
-	    loader.load.spritesheet(BRICK, 'assets/brick.png', 16, 16);
-	    loader.load.spritesheet(BOOK, 'assets/book.png', 16, 16);
+	    loader.load.spritesheet(PLAYER, 'player.png', 16, 16);
+	    loader.load.spritesheet(ALIEN, 'alien.png', 16, 16);
+	    loader.load.spritesheet(BRICK, 'brick.png', 16, 16);
+	    loader.load.spritesheet(BOOK, 'book.png', 16, 16);
 	  },
 	
 	  player: function player(game, x, y) {
@@ -837,8 +837,8 @@
 	
 	module.exports = {
 	  load: function load(loader) {
-	    loader.load.bitmapFont(DISPLAY_FONT, 'assets/Blocktopia_32pt.png', 'assets/Blocktopia_32pt.fnt');
-	    loader.load.bitmapFont(BODY_FONT, 'assets/Blocktopia_12pt.png', 'assets/Blocktopia_12pt.fnt');
+	    loader.load.bitmapFont(DISPLAY_FONT, 'Blocktopia_32pt.png', 'Blocktopia_32pt.fnt');
+	    loader.load.bitmapFont(BODY_FONT, 'Blocktopia_12pt.png', 'Blocktopia_12pt.fnt');
 	  },
 	
 	  displayFont: function displayFont(game) {
