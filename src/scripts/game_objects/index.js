@@ -5,9 +5,9 @@ import SolarMeter from './SolarMeter';
 import Spell from './Spell';
 import Spells from './Spells';
 import BrickSprite from './BrickSprite'; //importing the bricksprite class
-
 import Room from './Room';
 import Book from './Book';
+import Grass from './Grass';
 
 const PLAYER = 'player';
 const ENEMIES = 'enemies';
@@ -18,6 +18,7 @@ const ROOM = 'room';
 const BOOK = 'book';
 const SPELL = 'spell';
 const SPELLS = 'spells';
+const GRASS = 'grass';
 
 module.exports = {
   load: function load (loader) {
@@ -27,6 +28,7 @@ module.exports = {
     loader.load.spritesheet(BOOK, 'book.png', 16, 16);
     loader.load.spritesheet(ROOM, 'room.png', 80, 80);
     loader.load.spritesheet(SPELL, 'spell.png', 16, 48);
+    loader.load.spritesheet(GRASS, 'grass.png', 320, 288);
   },
 
   enemies: function enemies (game, parent) {
@@ -67,5 +69,9 @@ module.exports = {
 
   spell: function spell (game, x, y) {
     return new Spell(game, x, y, SPELL);
+  },
+
+  grass: function grass (game, x, y) {
+    return new Grass(game, x, y, GRASS);
   }
 };

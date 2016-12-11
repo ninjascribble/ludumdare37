@@ -55,7 +55,7 @@
 	// 2x Gameboy resolution
 	var width = 320;
 	var height = 288;
-	var renderer = Phaser.AUTO;
+	var renderer = Phaser.WEBGL;
 	var parent = 'content';
 	var defaultState = null;
 	var transparent = false;
@@ -78,15 +78,15 @@
 	
 	var _Gameplay2 = _interopRequireDefault(_Gameplay);
 	
-	var _Gameover = __webpack_require__(16);
+	var _Gameover = __webpack_require__(17);
 	
 	var _Gameover2 = _interopRequireDefault(_Gameover);
 	
-	var _Loading = __webpack_require__(17);
+	var _Loading = __webpack_require__(18);
 	
 	var _Loading2 = _interopRequireDefault(_Loading);
 	
-	var _Menu = __webpack_require__(18);
+	var _Menu = __webpack_require__(19);
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
@@ -158,6 +158,8 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
+	// import 'phaser/filters/Gray';
+	
 	var Gameplay = function (_State2) {
 	  _inherits(Gameplay, _State2);
 	
@@ -172,7 +174,8 @@
 	    value: function create() {
 	      var _this2 = this;
 	
-	      this.stage.backgroundColor = '#a3ce27';
+	      this.background = _game_objects2.default.grass(this.game, 0, 0, this.world.width, this.world.height);
+	      // this.sunsetFilter = game.add.filter('Gray');
 	      this.world.setBounds(0, 0, this.world.width, this.world.height);
 	      this.player = _game_objects2.default.player(game, this.world.centerX, 60);
 	      this.solarMeter = _game_objects2.default.solarMeter(game);
@@ -183,6 +186,7 @@
 	      this.enemies.setTarget(this.book);
 	      this.enemies.setSpawnPoints([{ x: -16, y: -16 }, { x: -16, y: this.world.centerY }, { x: -16, y: this.world.height + 16 }, { x: this.world.width + 16, y: -16 }, { x: this.world.width + 16, y: this.world.centerY }, { x: this.world.width + 16, y: this.world.height + 16 }, { x: -16, y: -16 }, { x: this.world.centerX, y: -16 }, { x: this.world.width + 16, y: -16 }, { x: -16, y: this.world.height + 16 }, { x: this.world.centerX, y: this.world.height + 16 }, { x: this.world.width + 16, y: this.world.height + 16 }]);
 	
+	      this.add.existing(this.background);
 	      this.add.existing(this.room);
 	      this.add.existing(this.book);
 	      this.add.existing(this.enemies);
@@ -199,6 +203,8 @@
 	      this.solarMeter.draining();
 	
 	      this.spacebar = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+	
+	      // game.world.filters = [this.sunsetFilter];
 	
 	      this.solarMeter.onStartDraining.add(function () {
 	        _this2.book.close();
@@ -337,11 +343,14 @@
 	
 	var _Book2 = _interopRequireDefault(_Book);
 	
+	var _Grass = __webpack_require__(16);
+	
+	var _Grass2 = _interopRequireDefault(_Grass);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	//importing the bricksprite class
+	var PLAYER = 'player'; //importing the bricksprite class
 	
-	var PLAYER = 'player';
 	var ENEMIES = 'enemies';
 	var SOLAR_METER = 'solar_meter';
 	var ALIEN = 'alien';
@@ -350,6 +359,7 @@
 	var BOOK = 'book';
 	var SPELL = 'spell';
 	var SPELLS = 'spells';
+	var GRASS = 'grass';
 	
 	module.exports = {
 	  load: function load(loader) {
@@ -359,6 +369,7 @@
 	    loader.load.spritesheet(BOOK, 'book.png', 16, 16);
 	    loader.load.spritesheet(ROOM, 'room.png', 80, 80);
 	    loader.load.spritesheet(SPELL, 'spell.png', 16, 48);
+	    loader.load.spritesheet(GRASS, 'grass.png', 320, 288);
 	  },
 	
 	  enemies: function enemies(game, parent) {
@@ -399,6 +410,10 @@
 	
 	  spell: function spell(game, x, y) {
 	    return new _Spell2.default(game, x, y, SPELL);
+	  },
+	
+	  grass: function grass(game, x, y) {
+	    return new _Grass2.default(game, x, y, GRASS);
 	  }
 	};
 
@@ -1198,6 +1213,36 @@
 
 /***/ },
 /* 16 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Grass = function (_Phaser$Sprite) {
+	  _inherits(Grass, _Phaser$Sprite);
+	
+	  function Grass(game, x, y, key) {
+	    _classCallCheck(this, Grass);
+	
+	    return _possibleConstructorReturn(this, (Grass.__proto__ || Object.getPrototypeOf(Grass)).call(this, game, x, y, key));
+	  }
+	
+	  return Grass;
+	}(Phaser.Sprite);
+	
+	exports.default = Grass;
+
+/***/ },
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1270,7 +1315,7 @@
 	exports.default = Gameover;
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1352,7 +1397,7 @@
 	exports.default = Loading;
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

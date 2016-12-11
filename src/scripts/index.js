@@ -3,7 +3,7 @@ import States from './states';
 // 2x Gameboy resolution
 const width = 320;
 const height = 288;
-const renderer = Phaser.AUTO;
+const renderer = Phaser.WEBGL;
 const parent = 'content';
 const defaultState = null;
 const transparent = false;
