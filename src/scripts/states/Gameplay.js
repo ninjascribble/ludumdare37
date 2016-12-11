@@ -13,6 +13,7 @@ export default class Gameplay extends _State {
     this.room = GameObjects.room(game, 120, 104);
     this.enemies.setTarget(this.book);
     this.enemies.setSpawnPoints([
+      //{ x: 50, y: 50}
       { x: -16, y: -16 },
       { x: -16, y: this.world.centerY },
       { x: -16, y: this.world.height + 16 },

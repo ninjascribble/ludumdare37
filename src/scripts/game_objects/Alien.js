@@ -32,6 +32,23 @@ export default class Alien extends Phaser.Sprite {
     }
   }
 
+  determineMovement () {
+    const randNum = this.game.rnd.integerInRange(1, 100);
+    const xDiff = 160 - this.x;
+    const yDiff = 144 - this.y;
+
+    //If the enemy isn't next to the book then procede with movement
+    if (Math.abs(xDiff) > 16 &&  Math.abs(yDiff) > 16){
+      if(randNum > 40){
+        this.moveToBook(xDiff, yDiff);
+      }
+      else{
+        this.travel();
+      }
+    }
+  }
+
+  //Move the enemy in a random direction.
   travel () {
     const dirNum = this.game.rnd.integerInRange(1, 4);
 
@@ -44,6 +61,23 @@ export default class Alien extends Phaser.Sprite {
         break;
       case 4: this.moveDown();
         break;
+    }
+  }
+
+  //Move the enemy towards the book.
+  moveToBook(xDiff, yDiff){
+    if(xDiff > 0) {
+      this.moveRight();
+    }
+    else {
+      this.moveLeft();
+    }
+
+    if(yDiff > 0){
+      this.moveDown();
+    }
+    else{
+      this.moveUp();
     }
   }
 
