@@ -184,7 +184,9 @@
 	      this.book = _game_objects2.default.book(game, 152, 124);
 	      this.room = _game_objects2.default.room(game, 120, 104);
 	      this.enemies.setTarget(this.book);
-	      this.enemies.setSpawnPoints([{ x: -16, y: -16 }, { x: -16, y: this.world.centerY }, { x: -16, y: this.world.height + 16 }, { x: this.world.width + 16, y: -16 }, { x: this.world.width + 16, y: this.world.centerY }, { x: this.world.width + 16, y: this.world.height + 16 }, { x: -16, y: -16 }, { x: this.world.centerX, y: -16 }, { x: this.world.width + 16, y: -16 }, { x: -16, y: this.world.height + 16 }, { x: this.world.centerX, y: this.world.height + 16 }, { x: this.world.width + 16, y: this.world.height + 16 }]);
+	      this.enemies.setSpawnPoints([
+	      //{ x: 50, y: 50}
+	      { x: -16, y: -16 }, { x: -16, y: this.world.centerY }, { x: -16, y: this.world.height + 16 }, { x: this.world.width + 16, y: -16 }, { x: this.world.width + 16, y: this.world.centerY }, { x: this.world.width + 16, y: this.world.height + 16 }, { x: -16, y: -16 }, { x: this.world.centerX, y: -16 }, { x: this.world.width + 16, y: -16 }, { x: -16, y: this.world.height + 16 }, { x: this.world.centerX, y: this.world.height + 16 }, { x: this.world.width + 16, y: this.world.height + 16 }]);
 	
 	      this.add.existing(this.background);
 	      this.add.existing(this.room);
@@ -584,7 +586,7 @@
 	
 	      timer.loop(MOVE_DELAY, function () {
 	        _this2.children.forEach(function (enemy) {
-	          return enemy.travel();
+	          return enemy.determineMovement();
 	        });
 	      }, this);
 	      timer.start();
@@ -690,6 +692,25 @@
 	      }
 	    }
 	  }, {
+	    key: 'determineMovement',
+	    value: function determineMovement() {
+	      var randNum = this.game.rnd.integerInRange(1, 100);
+	      var xDiff = 160 - this.x;
+	      var yDiff = 144 - this.y;
+	
+	      //If the enemy isn't next to the book then procede with movement
+	      if (Math.abs(xDiff) > 16 && Math.abs(yDiff) > 16) {
+	        if (randNum > 40) {
+	          this.moveToBook(xDiff, yDiff);
+	        } else {
+	          this.travel();
+	        }
+	      }
+	    }
+	
+	    //Move the enemy in a random direction.
+	
+	  }, {
 	    key: 'travel',
 	    value: function travel() {
 	      var dirNum = this.game.rnd.integerInRange(1, 4);
@@ -707,6 +728,24 @@
 	        case 4:
 	          this.moveDown();
 	          break;
+	      }
+	    }
+	
+	    //Move the enemy towards the book.
+	
+	  }, {
+	    key: 'moveToBook',
+	    value: function moveToBook(xDiff, yDiff) {
+	      if (xDiff > 0) {
+	        this.moveRight();
+	      } else {
+	        this.moveLeft();
+	      }
+	
+	      if (yDiff > 0) {
+	        this.moveDown();
+	      } else {
+	        this.moveUp();
 	      }
 	    }
 	  }, {
@@ -1255,7 +1294,7 @@
 	
 	    this.uniforms.alpha = { type: '1f', value: 0.5 };
 	
-	    this.fragmentSrc = ["precision mediump float;", "varying vec2       vTextureCoord;", "varying vec4       vColor;", "uniform sampler2D  uSampler;", "uniform float      alpha;", "void main(void) {", "gl_FragColor = texture2D(uSampler, vTextureCoord);", "float r = 0.6126 * gl_FragColor.r;", "float g = 0.4152 * gl_FragColor.g;", "float b = 0.0722 * gl_FragColor.b;", "vec3 color = vec3(r, g, b);", "gl_FragColor.rgb = mix(gl_FragColor.rgb, color, alpha);", "}"];
+	    this.fragmentSrc = ["precision mediump float;", "varying vec2       vTextureCoord;", "varying vec4       vColor;", "uniform sampler2D  uSampler;", "uniform float      alpha;", "void main(void) {", "gl_FragColor = texture2D(uSampler, vTextureCoord);", "float r = 0.5126 * gl_FragColor.r;", "float g = 0.2152 * gl_FragColor.g;", "float b = 0.7722 * gl_FragColor.b;", "vec3 color = vec3(r, g, b);", "gl_FragColor.rgb = mix(gl_FragColor.rgb, color, alpha);", "}"];
 	};
 	
 	Phaser.Filter.Sunset.prototype = Object.create(Phaser.Filter.prototype);
