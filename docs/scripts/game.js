@@ -78,15 +78,15 @@
 	
 	var _Gameplay2 = _interopRequireDefault(_Gameplay);
 	
-	var _Gameover = __webpack_require__(17);
+	var _Gameover = __webpack_require__(18);
 	
 	var _Gameover2 = _interopRequireDefault(_Gameover);
 	
-	var _Loading = __webpack_require__(18);
+	var _Loading = __webpack_require__(19);
 	
 	var _Loading2 = _interopRequireDefault(_Loading);
 	
-	var _Menu = __webpack_require__(19);
+	var _Menu = __webpack_require__(20);
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
@@ -150,6 +150,8 @@
 	
 	var _display_objects2 = _interopRequireDefault(_display_objects);
 	
+	__webpack_require__(17);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -157,8 +159,6 @@
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	// import 'phaser/filters/Gray';
 	
 	var Gameplay = function (_State2) {
 	  _inherits(Gameplay, _State2);
@@ -175,7 +175,7 @@
 	      var _this2 = this;
 	
 	      this.background = _game_objects2.default.grass(this.game, 0, 0, this.world.width, this.world.height);
-	      // this.sunsetFilter = game.add.filter('Gray');
+	      this.sunsetFilter = game.add.filter('Sunset');
 	      this.world.setBounds(0, 0, this.world.width, this.world.height);
 	      this.player = _game_objects2.default.player(game, this.world.centerX, 60);
 	      this.solarMeter = _game_objects2.default.solarMeter(game);
@@ -204,7 +204,7 @@
 	
 	      this.spacebar = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 	
-	      // game.world.filters = [this.sunsetFilter];
+	      game.world.filters = [this.sunsetFilter];
 	
 	      this.solarMeter.onStartDraining.add(function () {
 	        _this2.book.close();
@@ -225,6 +225,8 @@
 	  }, {
 	    key: 'update',
 	    value: function update() {
+	      this.sunsetFilter.alpha = 1 - this.solarMeter.health / 100;
+	      this.sunsetFilter.update();
 	      this.game.physics.arcade.collide(this.player, this.enemies);
 	      this.game.physics.arcade.collide(this.player, this.book);
 	      this.game.physics.arcade.collide(this.enemies, this.enemies);
@@ -1243,6 +1245,39 @@
 
 /***/ },
 /* 17 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Phaser.Filter.Sunset = function (game) {
+	
+	    Phaser.Filter.call(this, game);
+	
+	    this.uniforms.alpha = { type: '1f', value: 0.5 };
+	
+	    this.fragmentSrc = ["precision mediump float;", "varying vec2       vTextureCoord;", "varying vec4       vColor;", "uniform sampler2D  uSampler;", "uniform float      alpha;", "void main(void) {", "gl_FragColor = texture2D(uSampler, vTextureCoord);", "float r = 0.6126 * gl_FragColor.r;", "float g = 0.4152 * gl_FragColor.g;", "float b = 0.0722 * gl_FragColor.b;", "vec3 color = vec3(r, g, b);", "gl_FragColor.rgb = mix(gl_FragColor.rgb, color, alpha);", "}"];
+	};
+	
+	Phaser.Filter.Sunset.prototype = Object.create(Phaser.Filter.prototype);
+	Phaser.Filter.Sunset.prototype.constructor = Phaser.Filter.Sunset;
+	
+	/**
+	* The strength of the alpha. 1 will make the object black and white, 0 will make the object its normal color
+	* @property alpha
+	*/
+	Object.defineProperty(Phaser.Filter.Sunset.prototype, 'alpha', {
+	
+	    get: function get() {
+	        return this.uniforms.alpha.value;
+	    },
+	
+	    set: function set(value) {
+	        this.uniforms.alpha.value = value;
+	    }
+	});
+
+/***/ },
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1315,7 +1350,7 @@
 	exports.default = Gameover;
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1397,7 +1432,7 @@
 	exports.default = Loading;
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

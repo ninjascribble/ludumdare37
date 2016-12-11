@@ -1,12 +1,12 @@
 import _State from './_State';
 import GameObjects from '../game_objects';
 import DisplayObjects from '../display_objects';
-// import 'phaser/filters/Gray';
+import '../filters/Sunset';
 
 export default class Gameplay extends _State {
   create () {
     this.background = GameObjects.grass(this.game, 0, 0, this.world.width, this.world.height);
-    // this.sunsetFilter = game.add.filter('Gray');
+    this.sunsetFilter = game.add.filter('Sunset');
     this.world.setBounds(0, 0, this.world.width, this.world.height);
     this.player = GameObjects.player(game, this.world.centerX, 60);
     this.solarMeter = GameObjects.solarMeter(game);
@@ -48,7 +48,7 @@ export default class Gameplay extends _State {
 
     this.spacebar = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
-    // game.world.filters = [this.sunsetFilter];
+    game.world.filters = [this.sunsetFilter];
 
     this.solarMeter.onStartDraining.add(() => {
       this.book.close();
@@ -68,6 +68,8 @@ export default class Gameplay extends _State {
   }
 
   update () {
+    this.sunsetFilter.alpha = 1 - this.solarMeter.health / 100;
+    this.sunsetFilter.update();
     this.game.physics.arcade.collide(this.player, this.enemies);
     this.game.physics.arcade.collide(this.player, this.book);
     this.game.physics.arcade.collide(this.enemies, this.enemies);
