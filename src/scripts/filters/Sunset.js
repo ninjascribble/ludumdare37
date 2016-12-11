@@ -15,9 +15,9 @@ Phaser.Filter.Sunset = function (game) {
 
         "void main(void) {",
             "gl_FragColor = texture2D(uSampler, vTextureCoord);",
-            "float r = 0.6126 * gl_FragColor.r;",
-            "float g = 0.4152 * gl_FragColor.g;",
-            "float b = 0.0722 * gl_FragColor.b;",
+            "float r = 0.5126 * gl_FragColor.r;",
+            "float g = 0.2152 * gl_FragColor.g;",
+            "float b = 0.7722 * gl_FragColor.b;",
             "vec3 color = vec3(r, g, b);",
             "gl_FragColor.rgb = mix(gl_FragColor.rgb, color, alpha);",
         "}"
