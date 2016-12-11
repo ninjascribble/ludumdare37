@@ -35,6 +35,7 @@ export default class Gameplay extends _State {
     this.game.scores = {
       enemiesKilled: 0,
       timeElapsed: 0,
+      waves: 0
     };
 
     this.add.existing(this.background);
@@ -105,12 +106,14 @@ export default class Gameplay extends _State {
 
     if (this.solarMeter.health <= 0) {
       this.game.scores.timeElapsed = Date.now() - this.startAt;
+      this.game.scores.waves = this.enemies.itteration - 1;
       this.stateProvider.gameover(this.state, this.scoring);
     }
 
     this.sunsetFilter.alpha = 1 - this.solarMeter.health / 100;
     this.solarMeter.kills = this.game.scores.enemiesKilled;
     this.solarMeter.time = Date.now() - this.startAt;
+    this.solarMeter.wave = this.enemies.itteration - 1;
   }
 
   onSpellEnemyCollide (spell, enemy) {

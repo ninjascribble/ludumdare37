@@ -13,6 +13,7 @@ export default class SolarMeter extends Phaser.Group {
     this.health = MAX_HEALTH;
     this.kills = 0;
     this.time = 0;
+    this.wave = 0;
 
     this.drainTimer = this.game.time.create();
     this.drainTimer.loop(DRAIN_DELAY, () => this.drain(), this);
@@ -23,6 +24,7 @@ export default class SolarMeter extends Phaser.Group {
     this.hud = DisplayObjects.bodyFont(this.game, this.mkhealth(this.health), 16, 16);
     this.killCounter = DisplayObjects.bodyFont(this.game, this.mkkills(this.kills), 160, 16, 'center');
     this.timeCounter = DisplayObjects.bodyFont(this.game, this.mktime(this.time), 304, 16, 'right');
+    this.waveCounter = DisplayObjects.bodyFont(this.game, this.mkwave(this.wave), 160, 272, 'center');
 
     this.onStartDraining = new Phaser.Signal();
     this.onStartCharging = new Phaser.Signal();
@@ -30,6 +32,7 @@ export default class SolarMeter extends Phaser.Group {
     this.add(this.hud);
     this.add(this.killCounter);
     this.add(this.timeCounter);
+    this.add(this.waveCounter);
   }
 
   draining () {
@@ -66,6 +69,7 @@ export default class SolarMeter extends Phaser.Group {
     this.hud.text = this.mkhealth(this.health);
     this.killCounter.text = this.mkkills(this.kills);
     this.timeCounter.text = this.mktime(this.time);
+    this.waveCounter.text = this.mkwave(this.wave);
   }
 
   mkhealth (num) {
@@ -87,5 +91,9 @@ export default class SolarMeter extends Phaser.Group {
     if (seconds.length < 2) seconds = '0' + seconds;
 
     return [hours, minutes, seconds].join(':')
+  }
+
+  mkwave (num) {
+    return 'wave ' + num;
   }
 }

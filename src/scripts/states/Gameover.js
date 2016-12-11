@@ -31,6 +31,7 @@ export default class Gameover extends _State {
     this.solarMeter.health = 0;
     this.solarMeter.kills = this.game.scores.enemiesKilled;
     this.solarMeter.time = this.game.scores.timeElapsed;
+    this.solarMeter.wave = this.game.scores.waves;
     this.solarMeter.update();
   }
 

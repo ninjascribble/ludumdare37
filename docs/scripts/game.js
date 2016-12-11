@@ -55,7 +55,7 @@
 	// 2x Gameboy resolution
 	var width = 320;
 	var height = 288;
-	var renderer = Phaser.WEBGL;
+	var renderer = Phaser.AUTO;
 	var parent = 'content';
 	var defaultState = null;
 	var transparent = false;
@@ -174,6 +174,7 @@
 	    value: function create() {
 	      var _this2 = this;
 	
+	      this.startAt = Date.now();
 	      this.background = _game_objects2.default.grass(this.game, 0, 0, this.world.width, this.world.height);
 	      this.sunsetFilter = game.add.filter('Sunset');
 	      this.world.setBounds(0, 0, this.world.width, this.world.height);
@@ -185,8 +186,14 @@
 	      this.room = _game_objects2.default.room(game, 120, 104);
 	      this.enemies.setTarget(this.book);
 	      this.enemies.setSpawnPoints([
-	      //{ x: 50, y: 50}
+	      //{ x: 50, y: 50}, {x: 200, y: 50}
 	      { x: -16, y: -16 }, { x: -16, y: this.world.centerY }, { x: -16, y: this.world.height + 16 }, { x: this.world.width + 16, y: -16 }, { x: this.world.width + 16, y: this.world.centerY }, { x: this.world.width + 16, y: this.world.height + 16 }, { x: -16, y: -16 }, { x: this.world.centerX, y: -16 }, { x: this.world.width + 16, y: -16 }, { x: -16, y: this.world.height + 16 }, { x: this.world.centerX, y: this.world.height + 16 }, { x: this.world.width + 16, y: this.world.height + 16 }]);
+	
+	      this.game.scores = {
+	        enemiesKilled: 0,
+	        timeElapsed: 0,
+	        waves: 0
+	      };
 	
 	      this.add.existing(this.background);
 	      this.add.existing(this.room);
@@ -231,7 +238,7 @@
 	      this.game.physics.arcade.collide(this.player, this.enemies);
 	      this.game.physics.arcade.collide(this.player, this.book);
 	      this.game.physics.arcade.collide(this.enemies, this.enemies);
-	      this.game.physics.arcade.overlap(this.spells, this.enemies, this.onSpellEnemyCollide);
+	      this.game.physics.arcade.overlap(this.spells, this.enemies, this.onSpellEnemyCollide.bind(this));
 	
 	      if (this.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
 	        this.player.moveLeft();
@@ -256,14 +263,20 @@
 	      }
 	
 	      if (this.solarMeter.health <= 0) {
-	        this.stateProvider.gameover(this.state);
+	        this.game.scores.timeElapsed = Date.now() - this.startAt;
+	        this.game.scores.waves = this.enemies.itteration - 1;
+	        this.stateProvider.gameover(this.state, this.scoring);
 	      }
 	
 	      this.sunsetFilter.alpha = 1 - this.solarMeter.health / 100;
+	      this.solarMeter.kills = this.game.scores.enemiesKilled;
+	      this.solarMeter.time = Date.now() - this.startAt;
+	      this.solarMeter.wave = this.enemies.itteration - 1;
 	    }
 	  }, {
 	    key: 'onSpellEnemyCollide',
 	    value: function onSpellEnemyCollide(spell, enemy) {
+	      this.game.scores.enemiesKilled++;
 	      enemy.kill();
 	    }
 	  }]);
@@ -549,7 +562,7 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var MOVE_DELAY = 500;
-	var SPAWN_DELAY = 200;
+	var SPAWN_DELAY = 4000;
 	
 	var Enemies = function (_Phaser$Group) {
 	  _inherits(Enemies, _Phaser$Group);
@@ -560,6 +573,7 @@
 	    var _this = _possibleConstructorReturn(this, (Enemies.__proto__ || Object.getPrototypeOf(Enemies)).call(this, game, parent, name));
 	
 	    _this.onEnterTargetZone = new Phaser.Signal();
+	    _this.itteration = 1;
 	    return _this;
 	  }
 	
@@ -599,6 +613,7 @@
 	
 	      var timer = this.game.time.create();
 	
+	      this.spawnAlien();
 	      timer.loop(SPAWN_DELAY, function () {
 	        return _this3.spawnAlien();
 	      }, this);
@@ -607,9 +622,12 @@
 	  }, {
 	    key: "spawnAlien",
 	    value: function spawnAlien() {
-	      var spawnPoint = this.game.rnd.pick(this.spawnPoints);
+	      for (var i = 0; i < this.itteration; i++) {
+	        var spawnPoint = this.game.rnd.pick(this.spawnPoints);
+	        this.spawnAlienAt(spawnPoint.x, spawnPoint.y);
+	      }
 	
-	      this.spawnAlienAt(spawnPoint.x, spawnPoint.y);
+	      this.itteration++;
 	    }
 	  }, {
 	    key: "spawnAlienAt",
@@ -729,7 +747,7 @@
 	
 	      //If the enemy isn't next to the book then procede with movement
 	      if (Math.abs(xDiff) > 16 || Math.abs(yDiff) > 16) {
-	        if (randNum > 40) {
+	        if (randNum > 30) {
 	          this.moveToBook(xDiff, yDiff);
 	        } else {
 	          this.travel();
@@ -868,6 +886,9 @@
 	    var _this = _possibleConstructorReturn(this, (SolarMeter.__proto__ || Object.getPrototypeOf(SolarMeter)).call(this, game, parent, name));
 	
 	    _this.health = MAX_HEALTH;
+	    _this.kills = 0;
+	    _this.time = 0;
+	    _this.wave = 0;
 	
 	    _this.drainTimer = _this.game.time.create();
 	    _this.drainTimer.loop(DRAIN_DELAY, function () {
@@ -879,12 +900,18 @@
 	      return _this.charge();
 	    }, _this);
 	
-	    _this.hud = _display_objects2.default.bodyFont(_this.game, _this.health, 16, 16);
+	    _this.hud = _display_objects2.default.bodyFont(_this.game, _this.mkhealth(_this.health), 16, 16);
+	    _this.killCounter = _display_objects2.default.bodyFont(_this.game, _this.mkkills(_this.kills), 160, 16, 'center');
+	    _this.timeCounter = _display_objects2.default.bodyFont(_this.game, _this.mktime(_this.time), 304, 16, 'right');
+	    _this.waveCounter = _display_objects2.default.bodyFont(_this.game, _this.mkwave(_this.wave), 160, 272, 'center');
 	
 	    _this.onStartDraining = new Phaser.Signal();
 	    _this.onStartCharging = new Phaser.Signal();
 	
 	    _this.add(_this.hud);
+	    _this.add(_this.killCounter);
+	    _this.add(_this.timeCounter);
+	    _this.add(_this.waveCounter);
 	    return _this;
 	  }
 	
@@ -925,7 +952,39 @@
 	  }, {
 	    key: 'update',
 	    value: function update() {
-	      this.hud.text = this.health;
+	      this.hud.text = this.mkhealth(this.health);
+	      this.killCounter.text = this.mkkills(this.kills);
+	      this.timeCounter.text = this.mktime(this.time);
+	      this.waveCounter.text = this.mkwave(this.wave);
+	    }
+	  }, {
+	    key: 'mkhealth',
+	    value: function mkhealth(num) {
+	      return num + ' sols';
+	    }
+	  }, {
+	    key: 'mkkills',
+	    value: function mkkills(num) {
+	      return num + ' kills';
+	    }
+	  }, {
+	    key: 'mktime',
+	    value: function mktime(ms) {
+	      var dt = new Date(ms);
+	      var hours = String(16 - dt.getHours());
+	      var minutes = String(dt.getMinutes());
+	      var seconds = String(dt.getSeconds());
+	
+	      if (hours.length < 2) hours = '0' + hours;
+	      if (minutes.length < 2) minutes = '0' + minutes;
+	      if (seconds.length < 2) seconds = '0' + seconds;
+	
+	      return [hours, minutes, seconds].join(':');
+	    }
+	  }, {
+	    key: 'mkwave',
+	    value: function mkwave(num) {
+	      return 'wave ' + num;
 	    }
 	  }]);
 	
@@ -1394,6 +1453,7 @@
 	      this.sunsetFilter = game.add.filter('Sunset');
 	      this.room = _game_objects2.default.room(game, 120, 104);
 	      this.book = _game_objects2.default.book(game, 152, 124);
+	      this.solarMeter = _game_objects2.default.solarMeter(game);
 	
 	      this.world.setBounds(0, 0, this.world.width, this.world.height);
 	
@@ -1404,10 +1464,19 @@
 	      this.add.existing(this.book);
 	      this.add.existing(this.titleText());
 	      this.add.existing(this.actionText());
+	      this.add.existing(this.solarMeter);
+	
+	      this.game.world.bringToTop(this.solarMeter);
 	
 	      game.world.filters = [this.sunsetFilter];
 	      this.sunsetFilter.alpha = 1;
 	      this.sunsetFilter.update();
+	
+	      this.solarMeter.health = 0;
+	      this.solarMeter.kills = this.game.scores.enemiesKilled;
+	      this.solarMeter.time = this.game.scores.timeElapsed;
+	      this.solarMeter.wave = this.game.scores.waves;
+	      this.solarMeter.update();
 	    }
 	  }, {
 	    key: 'titleText',
