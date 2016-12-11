@@ -78,15 +78,15 @@
 	
 	var _Gameplay2 = _interopRequireDefault(_Gameplay);
 	
-	var _Gameover = __webpack_require__(14);
+	var _Gameover = __webpack_require__(16);
 	
 	var _Gameover2 = _interopRequireDefault(_Gameover);
 	
-	var _Loading = __webpack_require__(15);
+	var _Loading = __webpack_require__(17);
 	
 	var _Loading2 = _interopRequireDefault(_Loading);
 	
-	var _Menu = __webpack_require__(16);
+	var _Menu = __webpack_require__(18);
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
@@ -177,6 +177,7 @@
 	      this.player = _game_objects2.default.player(game, this.world.centerX, 60);
 	      this.solarMeter = _game_objects2.default.solarMeter(game);
 	      this.enemies = _game_objects2.default.enemies(game);
+	      this.spells = _game_objects2.default.spells(game);
 	      this.book = _game_objects2.default.book(game, 152, 124);
 	      this.room = _game_objects2.default.room(game, 120, 104);
 	      this.enemies.setTarget(this.book);
@@ -187,13 +188,17 @@
 	      this.add.existing(this.enemies);
 	      this.add.existing(this.player);
 	      this.add.existing(this.solarMeter);
+	      this.add.existing(this.spells);
 	
 	      this.game.world.bringToTop(this.enemies);
+	      this.game.world.bringToTop(this.spells);
 	      this.game.world.bringToTop(this.solarMeter);
 	
 	      this.enemies.startMoveTimer();
 	      this.enemies.startSpawnTimer();
 	      this.solarMeter.draining();
+	
+	      this.spacebar = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 	
 	      this.solarMeter.onStartDraining.add(function () {
 	        _this2.book.close();
@@ -206,13 +211,18 @@
 	      this.enemies.onEnterTargetZone.add(function () {
 	        _this2.solarMeter.health--;
 	      }, this);
+	
+	      this.spacebar.onDown.add(function () {
+	        _this2.spells.spawnSpellAt(_this2.player.x + 8, _this2.player.y + 8, _this2.player.facing);
+	      }, this);
 	    }
 	  }, {
 	    key: 'update',
 	    value: function update() {
-	      this.game.physics.arcade.overlap(this.player, this.enemies, this.onPlayerEnemyCollide);
+	      this.game.physics.arcade.collide(this.player, this.enemies);
 	      this.game.physics.arcade.collide(this.player, this.book);
 	      this.game.physics.arcade.collide(this.enemies, this.enemies);
+	      this.game.physics.arcade.overlap(this.spells, this.enemies, this.onSpellEnemyCollide);
 	
 	      if (this.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
 	        this.player.moveLeft();
@@ -241,13 +251,9 @@
 	      }
 	    }
 	  }, {
-	    key: 'onPlayerEnemyCollide',
-	    value: function onPlayerEnemyCollide(player, enemy) {
-	      enemy.body.velocity.x = 0;
-	      enemy.body.velocity.y = 0;
-	      setTimeout(function () {
-	        return enemy.kill();
-	      }, 100);
+	    key: 'onSpellEnemyCollide',
+	    value: function onSpellEnemyCollide(spell, enemy) {
+	      enemy.kill();
 	    }
 	  }]);
 	
@@ -311,15 +317,23 @@
 	
 	var _SolarMeter2 = _interopRequireDefault(_SolarMeter);
 	
-	var _BrickSprite = __webpack_require__(11);
+	var _Spell = __webpack_require__(11);
+	
+	var _Spell2 = _interopRequireDefault(_Spell);
+	
+	var _Spells = __webpack_require__(12);
+	
+	var _Spells2 = _interopRequireDefault(_Spells);
+	
+	var _BrickSprite = __webpack_require__(13);
 	
 	var _BrickSprite2 = _interopRequireDefault(_BrickSprite);
 	
-	var _Room = __webpack_require__(12);
+	var _Room = __webpack_require__(14);
 	
 	var _Room2 = _interopRequireDefault(_Room);
 	
-	var _Book = __webpack_require__(13);
+	var _Book = __webpack_require__(15);
 	
 	var _Book2 = _interopRequireDefault(_Book);
 	
@@ -334,6 +348,8 @@
 	var BRICK = 'brick';
 	var ROOM = 'room';
 	var BOOK = 'book';
+	var SPELL = 'spell';
+	var SPELLS = 'spells';
 	
 	module.exports = {
 	  load: function load(loader) {
@@ -342,6 +358,23 @@
 	    loader.load.spritesheet(BRICK, 'brick.png', 16, 16);
 	    loader.load.spritesheet(BOOK, 'book.png', 16, 16);
 	    loader.load.spritesheet(ROOM, 'room.png', 80, 80);
+	    loader.load.spritesheet(SPELL, 'spell.png', 16, 48);
+	  },
+	
+	  enemies: function enemies(game, parent) {
+	    var group = new _Enemies2.default(game, parent, ENEMIES);
+	    group.setAlienBuilder(module.exports.alien);
+	    return group;
+	  },
+	
+	  spells: function enemies(game, parent) {
+	    var group = new _Spells2.default(game, parent, SPELLS);
+	    group.setSpellBuilder(module.exports.spell);
+	    return group;
+	  },
+	
+	  solarMeter: function solarMeter(game, parent) {
+	    return new _SolarMeter2.default(game, parent, SOLAR_METER);
 	  },
 	
 	  player: function player(game, x, y) {
@@ -352,12 +385,6 @@
 	    return new _Room2.default(game, x, y, ROOM);
 	  },
 	
-	  enemies: function enemies(game, parent) {
-	    var group = new _Enemies2.default(game, parent, ENEMIES);
-	    group.setAlienBuilder(module.exports.alien);
-	    return group;
-	  },
-	
 	  alien: function alien(game, x, y) {
 	    return new _Alien2.default(game, x, y, ALIEN);
 	  },
@@ -366,12 +393,12 @@
 	    return new _BrickSprite2.default(game, x, y, BRICK);
 	  },
 	
-	  solarMeter: function solarMeter(game, parent) {
-	    return new _SolarMeter2.default(game, parent, SOLAR_METER);
-	  },
-	
 	  book: function book(game, x, y) {
 	    return new _Book2.default(game, x, y, BOOK);
+	  },
+	
+	  spell: function spell(game, x, y) {
+	    return new _Spell2.default(game, x, y, SPELL);
 	  }
 	};
 
@@ -408,6 +435,8 @@
 	    var _this = _possibleConstructorReturn(this, (Player.__proto__ || Object.getPrototypeOf(Player)).call(this, game, x, y, key));
 	
 	    game.physics.enable(_this);
+	
+	    _this.facing = LEFT;
 	
 	    _this.body.drag.x = 1000;
 	    _this.body.drag.y = 1000;
@@ -926,6 +955,136 @@
 /* 11 */
 /***/ function(module, exports) {
 
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var UP = 'up';
+	var DOWN = 'down';
+	var LEFT = 'left';
+	var RIGHT = 'right';
+	
+	var Spell = function (_Phaser$Sprite) {
+	  _inherits(Spell, _Phaser$Sprite);
+	
+	  function Spell(game, x, y, name) {
+	    _classCallCheck(this, Spell);
+	
+	    var _this = _possibleConstructorReturn(this, (Spell.__proto__ || Object.getPrototypeOf(Spell)).call(this, game, x, y, name));
+	
+	    game.physics.enable(_this);
+	
+	    _this.anchor.x = 0;
+	    _this.anchor.y = .5;
+	    _this.animations.add('cast', [1, 2, 3], 12, false);
+	    return _this;
+	  }
+	
+	  _createClass(Spell, [{
+	    key: 'cast',
+	    value: function cast(facing) {
+	      this.animations.play('cast');
+	
+	      switch (facing) {
+	        case LEFT:
+	          this.angle = 180;
+	          this.body.velocity.x = -200;
+	          this.body.velocity.y = 0;
+	          break;
+	        case RIGHT:
+	          this.angle = 0;
+	          this.body.velocity.x = 200;
+	          this.body.velocity.y = 0;
+	          break;
+	        case UP:
+	          this.angle = 270;
+	          this.body.velocity.x = 0;
+	          this.body.velocity.y = -200;
+	          break;
+	        case DOWN:
+	          this.angle = 90;
+	          this.body.velocity.x = 0;
+	          this.body.velocity.y = 200;
+	          break;
+	      }
+	
+	      setTimeout(this.kill.bind(this), 250);
+	    }
+	  }]);
+	
+	  return Spell;
+	}(Phaser.Sprite);
+	
+	exports.default = Spell;
+
+/***/ },
+/* 12 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Spells = function (_Phaser$Group) {
+	  _inherits(Spells, _Phaser$Group);
+	
+	  function Spells(game, parent, name) {
+	    _classCallCheck(this, Spells);
+	
+	    return _possibleConstructorReturn(this, (Spells.__proto__ || Object.getPrototypeOf(Spells)).call(this, game, parent, name));
+	  }
+	
+	  _createClass(Spells, [{
+	    key: "setSpellBuilder",
+	    value: function setSpellBuilder(builder) {
+	      this.spellBuilder = builder;
+	    }
+	  }, {
+	    key: "spawnSpellAt",
+	    value: function spawnSpellAt(x, y, facing) {
+	      if (this.countLiving() > 500) {
+	        return;
+	      }
+	
+	      var spawn = this.getFirstDead() || this.spellBuilder(game);
+	
+	      spawn.x = x;
+	      spawn.y = y;
+	      spawn.revive();
+	      spawn.cast(facing);
+	      this.add(spawn);
+	    }
+	  }]);
+	
+	  return Spells;
+	}(Phaser.Group);
+	
+	exports.default = Spells;
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
 	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
@@ -957,7 +1116,7 @@
 	exports.default = Bricksprite;
 
 /***/ },
-/* 12 */
+/* 14 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -987,7 +1146,7 @@
 	exports.default = Room;
 
 /***/ },
-/* 13 */
+/* 15 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1038,7 +1197,7 @@
 	exports.default = Book;
 
 /***/ },
-/* 14 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1111,7 +1270,7 @@
 	exports.default = Gameover;
 
 /***/ },
-/* 15 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1193,7 +1352,7 @@
 	exports.default = Loading;
 
 /***/ },
-/* 16 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
