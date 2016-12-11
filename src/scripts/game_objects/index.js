@@ -23,7 +23,7 @@ const GRASS = 'grass';
 module.exports = {
   load: function load (loader) {
     loader.load.spritesheet(PLAYER, 'player.png', 16, 16);
-    loader.load.spritesheet(ALIEN, 'alien.png', 16, 16);
+    loader.load.spritesheet(ALIEN, 'bat.png', 16, 16);
     loader.load.spritesheet(BRICK, 'brick.png', 16, 16);
     loader.load.spritesheet(BOOK, 'book.png', 16, 16);
     loader.load.spritesheet(ROOM, 'room.png', 80, 80);

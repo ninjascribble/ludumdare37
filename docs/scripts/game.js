@@ -382,7 +382,7 @@
 	module.exports = {
 	  load: function load(loader) {
 	    loader.load.spritesheet(PLAYER, 'player.png', 16, 16);
-	    loader.load.spritesheet(ALIEN, 'alien.png', 16, 16);
+	    loader.load.spritesheet(ALIEN, 'bat.png', 16, 16);
 	    loader.load.spritesheet(BRICK, 'brick.png', 16, 16);
 	    loader.load.spritesheet(BOOK, 'book.png', 16, 16);
 	    loader.load.spritesheet(ROOM, 'room.png', 80, 80);
@@ -693,10 +693,10 @@
 	
 	    _this.body.onCollide = new Phaser.Signal();
 	
-	    _this.animations.add('walkDown', [0, 1, 0, 2], 6, true);
-	    _this.animations.add('walkUp', [3, 4, 3, 5], 6, true);
-	    _this.animations.add('walkRight', [6, 7, 6, 8], 6, true);
-	    _this.animations.add('walkLeft', [9, 10, 9, 11], 6, true);
+	    _this.animations.add('walkDown', [4, 5, 6, 7], 6, true);
+	    _this.animations.add('walkUp', [0, 1, 2, 3], 6, true);
+	    _this.animations.add('walkRight', [4, 5, 6, 7], 6, true);
+	    _this.animations.add('walkLeft', [4, 5, 6, 7], 6, true);
 	
 	    _this.target = null;
 	    _this.onEnterTargetZone = null;
