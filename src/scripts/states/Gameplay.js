@@ -1,14 +1,17 @@
 import _State from './_State';
 import GameObjects from '../game_objects';
 import DisplayObjects from '../display_objects';
+import '../filters/Sunset';
 
 export default class Gameplay extends _State {
   create () {
-    this.stage.backgroundColor = '#a3ce27';
+    this.background = GameObjects.grass(this.game, 0, 0, this.world.width, this.world.height);
+    this.sunsetFilter = game.add.filter('Sunset');
     this.world.setBounds(0, 0, this.world.width, this.world.height);
     this.player = GameObjects.player(game, this.world.centerX, 60);
     this.solarMeter = GameObjects.solarMeter(game);
     this.enemies = GameObjects.enemies(game);
+    this.spells = GameObjects.spells(game);
     this.book = GameObjects.book(game, 152, 124);
     this.room = GameObjects.room(game, 120, 104);
     this.enemies.setTarget(this.book);
@@ -28,18 +31,25 @@ export default class Gameplay extends _State {
       { x: this.world.width + 16, y: this.world.height + 16 }
     ]);
 
+    this.add.existing(this.background);
     this.add.existing(this.room);
     this.add.existing(this.book);
     this.add.existing(this.enemies);
     this.add.existing(this.player);
     this.add.existing(this.solarMeter);
+    this.add.existing(this.spells);
 
     this.game.world.bringToTop(this.enemies);
+    this.game.world.bringToTop(this.spells);
     this.game.world.bringToTop(this.solarMeter);
 
     this.enemies.startMoveTimer();
     this.enemies.startSpawnTimer();
     this.solarMeter.draining();
+
+    this.spacebar = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+
+    game.world.filters = [this.sunsetFilter];
 
     this.solarMeter.onStartDraining.add(() => {
       this.book.close();
@@ -52,12 +62,19 @@ export default class Gameplay extends _State {
     this.enemies.onEnterTargetZone.add(() => {
       this.solarMeter.health--;
     }, this);
+
+    this.spacebar.onDown.add(() => {
+      this.spells.spawnSpellAt(this.player.x + 8, this.player.y + 8, this.player.facing);
+    }, this);
   }
 
   update () {
-    this.game.physics.arcade.overlap(this.player, this.enemies, this.onPlayerEnemyCollide);
+    this.sunsetFilter.alpha = 1 - this.solarMeter.health / 100;
+    this.sunsetFilter.update();
+    this.game.physics.arcade.collide(this.player, this.enemies);
     this.game.physics.arcade.collide(this.player, this.book);
     this.game.physics.arcade.collide(this.enemies, this.enemies);
+    this.game.physics.arcade.overlap(this.spells, this.enemies, this.onSpellEnemyCollide)
 
     if (this.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
       this.player.moveLeft();
@@ -86,9 +103,7 @@ export default class Gameplay extends _State {
     }
   }
 
-  onPlayerEnemyCollide (player, enemy) {
-    enemy.body.velocity.x = 0;
-    enemy.body.velocity.y = 0;
-    setTimeout(() => enemy.kill(), 100);
+  onSpellEnemyCollide (spell, enemy) {
+    enemy.kill()
   }
 }

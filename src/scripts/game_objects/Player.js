@@ -10,6 +10,8 @@ export default class Player extends Phaser.Sprite {
 
     game.physics.enable(this);
 
+    this.facing = LEFT;
+
     this.body.drag.x = 1000;
     this.body.drag.y = 1000;
 
