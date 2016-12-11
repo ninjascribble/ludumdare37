@@ -227,7 +227,6 @@
 	  }, {
 	    key: 'update',
 	    value: function update() {
-	      this.sunsetFilter.alpha = 1 - this.solarMeter.health / 100;
 	      this.sunsetFilter.update();
 	      this.game.physics.arcade.collide(this.player, this.enemies);
 	      this.game.physics.arcade.collide(this.player, this.book);
@@ -259,6 +258,8 @@
 	      if (this.solarMeter.health <= 0) {
 	        this.stateProvider.gameover(this.state);
 	      }
+	
+	      this.sunsetFilter.alpha = 1 - this.solarMeter.health / 100;
 	    }
 	  }, {
 	    key: 'onSpellEnemyCollide',
@@ -645,6 +646,8 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
+	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -679,6 +682,10 @@
 	
 	    _this.target = null;
 	    _this.onEnterTargetZone = null;
+	    _this.attackTimer = _this.game.time.create();
+	    _this.attackTimer.loop(100, function () {
+	      _this.onEnterTargetZone && _this.onEnterTargetZone.dispatch();
+	    }, _this);
 	    return _this;
 	  }
 	
@@ -688,8 +695,30 @@
 	      if (this.target && this.overlap(this.target)) {
 	        this.body.velocity.x = 0;
 	        this.body.velocity.y = 0;
-	        this.onEnterTargetZone && this.onEnterTargetZone.dispatch();
+	        this.startAttacking();
+	      } else {
+	        this.stopAttacking();
 	      }
+	    }
+	  }, {
+	    key: 'startAttacking',
+	    value: function startAttacking() {
+	      if (!this.attackTimer.running) {
+	        this.attackTimer.start();
+	      }
+	    }
+	  }, {
+	    key: 'stopAttacking',
+	    value: function stopAttacking() {
+	      if (this.attackTimer.running) {
+	        this.attackTimer.stop(false);
+	      }
+	    }
+	  }, {
+	    key: 'kill',
+	    value: function kill() {
+	      this.stopAttacking();
+	      _get(Alien.prototype.__proto__ || Object.getPrototypeOf(Alien.prototype), 'kill', this).call(this);
 	    }
 	  }, {
 	    key: 'determineMovement',
