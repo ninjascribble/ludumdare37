@@ -184,7 +184,9 @@
 	      this.book = _game_objects2.default.book(game, 152, 124);
 	      this.room = _game_objects2.default.room(game, 120, 104);
 	      this.enemies.setTarget(this.book);
-	      this.enemies.setSpawnPoints([{ x: -16, y: -16 }, { x: -16, y: this.world.centerY }, { x: -16, y: this.world.height + 16 }, { x: this.world.width + 16, y: -16 }, { x: this.world.width + 16, y: this.world.centerY }, { x: this.world.width + 16, y: this.world.height + 16 }, { x: -16, y: -16 }, { x: this.world.centerX, y: -16 }, { x: this.world.width + 16, y: -16 }, { x: -16, y: this.world.height + 16 }, { x: this.world.centerX, y: this.world.height + 16 }, { x: this.world.width + 16, y: this.world.height + 16 }]);
+	      this.enemies.setSpawnPoints([
+	      //{ x: 50, y: 50}
+	      { x: -16, y: -16 }, { x: -16, y: this.world.centerY }, { x: -16, y: this.world.height + 16 }, { x: this.world.width + 16, y: -16 }, { x: this.world.width + 16, y: this.world.centerY }, { x: this.world.width + 16, y: this.world.height + 16 }, { x: -16, y: -16 }, { x: this.world.centerX, y: -16 }, { x: this.world.width + 16, y: -16 }, { x: -16, y: this.world.height + 16 }, { x: this.world.centerX, y: this.world.height + 16 }, { x: this.world.width + 16, y: this.world.height + 16 }]);
 	
 	      this.add.existing(this.background);
 	      this.add.existing(this.room);
@@ -225,7 +227,6 @@
 	  }, {
 	    key: 'update',
 	    value: function update() {
-	      this.sunsetFilter.alpha = 1 - this.solarMeter.health / 100;
 	      this.sunsetFilter.update();
 	      this.game.physics.arcade.collide(this.player, this.enemies);
 	      this.game.physics.arcade.collide(this.player, this.book);
@@ -257,6 +258,8 @@
 	      if (this.solarMeter.health <= 0) {
 	        this.stateProvider.gameover(this.state);
 	      }
+	
+	      this.sunsetFilter.alpha = 1 - this.solarMeter.health / 100;
 	    }
 	  }, {
 	    key: 'onSpellEnemyCollide',
@@ -584,7 +587,7 @@
 	
 	      timer.loop(MOVE_DELAY, function () {
 	        _this2.children.forEach(function (enemy) {
-	          return enemy.travel();
+	          return enemy.determineMovement();
 	        });
 	      }, this);
 	      timer.start();
@@ -643,6 +646,8 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
+	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -677,6 +682,10 @@
 	
 	    _this.target = null;
 	    _this.onEnterTargetZone = null;
+	    _this.attackTimer = _this.game.time.create();
+	    _this.attackTimer.loop(100, function () {
+	      _this.onEnterTargetZone && _this.onEnterTargetZone.dispatch();
+	    }, _this);
 	    return _this;
 	  }
 	
@@ -686,9 +695,50 @@
 	      if (this.target && this.overlap(this.target)) {
 	        this.body.velocity.x = 0;
 	        this.body.velocity.y = 0;
-	        this.onEnterTargetZone && this.onEnterTargetZone.dispatch();
+	        this.startAttacking();
+	      } else {
+	        this.stopAttacking();
 	      }
 	    }
+	  }, {
+	    key: 'startAttacking',
+	    value: function startAttacking() {
+	      if (!this.attackTimer.running) {
+	        this.attackTimer.start();
+	      }
+	    }
+	  }, {
+	    key: 'stopAttacking',
+	    value: function stopAttacking() {
+	      if (this.attackTimer.running) {
+	        this.attackTimer.stop(false);
+	      }
+	    }
+	  }, {
+	    key: 'kill',
+	    value: function kill() {
+	      this.stopAttacking();
+	      _get(Alien.prototype.__proto__ || Object.getPrototypeOf(Alien.prototype), 'kill', this).call(this);
+	    }
+	  }, {
+	    key: 'determineMovement',
+	    value: function determineMovement() {
+	      var randNum = this.game.rnd.integerInRange(1, 100);
+	      var xDiff = 160 - this.x;
+	      var yDiff = 144 - this.y;
+	
+	      //If the enemy isn't next to the book then procede with movement
+	      if (Math.abs(xDiff) > 16 && Math.abs(yDiff) > 16) {
+	        if (randNum > 40) {
+	          this.moveToBook(xDiff, yDiff);
+	        } else {
+	          this.travel();
+	        }
+	      }
+	    }
+	
+	    //Move the enemy in a random direction.
+	
 	  }, {
 	    key: 'travel',
 	    value: function travel() {
@@ -707,6 +757,24 @@
 	        case 4:
 	          this.moveDown();
 	          break;
+	      }
+	    }
+	
+	    //Move the enemy towards the book.
+	
+	  }, {
+	    key: 'moveToBook',
+	    value: function moveToBook(xDiff, yDiff) {
+	      if (xDiff > 0) {
+	        this.moveRight();
+	      } else {
+	        this.moveLeft();
+	      }
+	
+	      if (yDiff > 0) {
+	        this.moveDown();
+	      } else {
+	        this.moveUp();
 	      }
 	    }
 	  }, {
@@ -1255,7 +1323,7 @@
 	
 	    this.uniforms.alpha = { type: '1f', value: 0.5 };
 	
-	    this.fragmentSrc = ["precision mediump float;", "varying vec2       vTextureCoord;", "varying vec4       vColor;", "uniform sampler2D  uSampler;", "uniform float      alpha;", "void main(void) {", "gl_FragColor = texture2D(uSampler, vTextureCoord);", "float r = 0.6126 * gl_FragColor.r;", "float g = 0.4152 * gl_FragColor.g;", "float b = 0.0722 * gl_FragColor.b;", "vec3 color = vec3(r, g, b);", "gl_FragColor.rgb = mix(gl_FragColor.rgb, color, alpha);", "}"];
+	    this.fragmentSrc = ["precision mediump float;", "varying vec2       vTextureCoord;", "varying vec4       vColor;", "uniform sampler2D  uSampler;", "uniform float      alpha;", "void main(void) {", "gl_FragColor = texture2D(uSampler, vTextureCoord);", "float r = 0.5126 * gl_FragColor.r;", "float g = 0.2152 * gl_FragColor.g;", "float b = 0.7722 * gl_FragColor.b;", "vec3 color = vec3(r, g, b);", "gl_FragColor.rgb = mix(gl_FragColor.rgb, color, alpha);", "}"];
 	};
 	
 	Phaser.Filter.Sunset.prototype = Object.create(Phaser.Filter.prototype);
@@ -1296,6 +1364,12 @@
 	
 	var _display_objects2 = _interopRequireDefault(_display_objects);
 	
+	var _game_objects = __webpack_require__(4);
+	
+	var _game_objects2 = _interopRequireDefault(_game_objects);
+	
+	__webpack_require__(17);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1316,20 +1390,34 @@
 	  _createClass(Gameover, [{
 	    key: 'create',
 	    value: function create() {
-	      // this.stage.backgroundColor = '#AACCCC';
+	      this.background = _game_objects2.default.grass(this.game, 0, 0, this.world.width, this.world.height);
+	      this.sunsetFilter = game.add.filter('Sunset');
+	      this.room = _game_objects2.default.room(game, 120, 104);
+	      this.book = _game_objects2.default.book(game, 152, 124);
+	
+	      this.world.setBounds(0, 0, this.world.width, this.world.height);
+	
 	      this.stage.disableVisibilityChange = true;
+	
+	      this.add.existing(this.background);
+	      this.add.existing(this.room);
+	      this.add.existing(this.book);
 	      this.add.existing(this.titleText());
 	      this.add.existing(this.actionText());
+	
+	      game.world.filters = [this.sunsetFilter];
+	      this.sunsetFilter.alpha = 1;
+	      this.sunsetFilter.update();
 	    }
 	  }, {
 	    key: 'titleText',
 	    value: function titleText() {
-	      return _display_objects2.default.displayFont(game, 'Game Over', this.world.centerX, 100, 'center');
+	      return _display_objects2.default.displayFont(game, 'Game Over', this.world.centerX, 80, 'center');
 	    }
 	  }, {
 	    key: 'actionText',
 	    value: function actionText() {
-	      var text = _display_objects2.default.bodyFont(game, 'Press Spacebar to Play!', this.world.centerX, 190, 'center');
+	      var text = _display_objects2.default.bodyFont(game, 'Press ENTER to Play!', this.world.centerX, 200, 'center');
 	      this.time.events.loop(400, function () {
 	        return text.visible = !text.visible;
 	      });
@@ -1338,7 +1426,7 @@
 	  }, {
 	    key: 'update',
 	    value: function update() {
-	      if (this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+	      if (this.input.keyboard.isDown(Phaser.Keyboard.ENTER)) {
 	        this.stateProvider.gameplay(this.state);
 	      }
 	    }
@@ -1421,8 +1509,7 @@
 	  }, {
 	    key: 'create',
 	    value: function create() {
-	      // this.stateProvider.menu(this.state);
-	      this.stateProvider.gameplay(this.state);
+	      this.stateProvider.menu(this.state);
 	    }
 	  }]);
 	
@@ -1451,6 +1538,10 @@
 	
 	var _display_objects2 = _interopRequireDefault(_display_objects);
 	
+	var _game_objects = __webpack_require__(4);
+	
+	var _game_objects2 = _interopRequireDefault(_game_objects);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1471,8 +1562,17 @@
 	  _createClass(Menu, [{
 	    key: 'create',
 	    value: function create() {
-	      this.stage.backgroundColor = '#AACCCC';
+	      this.background = _game_objects2.default.grass(this.game, 0, 0, this.world.width, this.world.height);
+	      this.room = _game_objects2.default.room(game, 120, 104);
+	      this.book = _game_objects2.default.book(game, 152, 124);
+	
+	      this.world.setBounds(0, 0, this.world.width, this.world.height);
+	
 	      this.stage.disableVisibilityChange = true;
+	
+	      this.add.existing(this.background);
+	      this.add.existing(this.room);
+	      this.add.existing(this.book);
 	      this.add.existing(this.titleText());
 	      this.add.existing(this.alphabetText());
 	      this.add.existing(this.actionText());
@@ -1480,19 +1580,21 @@
 	  }, {
 	    key: 'titleText',
 	    value: function titleText() {
-	      return _display_objects2.default.displayFont(game, 'THIS IS THE MENU', this.world.centerX, 100, 'center');
+	      var text = _display_objects2.default.displayFont(game, '\nTHE HOUSE OF THE RISING SUN\n    ', this.world.centerX, 70, 'center');
+	      text.maxWidth = 300;
+	      return text;
 	    }
 	  }, {
 	    key: 'alphabetText',
 	    value: function alphabetText() {
-	      var text = _display_objects2.default.bodyFont(game, '\nAaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz\n1,234,567,890 Ti Tj To 77 71 73 91910 .:;,\n!\u2116;%:?*()_+-=.,/|"\'@#$^&{}[]', this.world.centerX, 145, 'center');
+	      var text = _display_objects2.default.bodyFont(game, '', this.world.centerX, 145, 'center');
 	      text.maxWidth = 300;
 	      return text;
 	    }
 	  }, {
 	    key: 'actionText',
 	    value: function actionText() {
-	      var text = _display_objects2.default.bodyFont(game, 'Press Spacebar to Play!', this.world.centerX, 190, 'center');
+	      var text = _display_objects2.default.bodyFont(game, '\nPress ENTER to Play!\n    ', this.world.centerX, 200, 'center');
 	      this.time.events.loop(400, function () {
 	        return text.visible = !text.visible;
 	      });
@@ -1501,7 +1603,7 @@
 	  }, {
 	    key: 'update',
 	    value: function update() {
-	      if (this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+	      if (this.input.keyboard.isDown(Phaser.Keyboard.ENTER)) {
 	        this.stateProvider.gameplay(this.state);
 	      }
 	    }

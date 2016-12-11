@@ -22,14 +22,37 @@ export default class Alien extends Phaser.Sprite {
 
     this.target = null;
     this.onEnterTargetZone = null;
+    this.attackTimer = this.game.time.create();
+    this.attackTimer.loop(100, () => {
+      this.onEnterTargetZone && this.onEnterTargetZone.dispatch();
+    }, this);
   }
 
   update () {
     if (this.target && this.overlap(this.target)) {
       this.body.velocity.x = 0;
       this.body.velocity.y = 0;
-      this.onEnterTargetZone && this.onEnterTargetZone.dispatch();
+      this.startAttacking();
+    } else {
+      this.stopAttacking();
     }
+  }
+
+  startAttacking () {
+    if (!this.attackTimer.running) {
+      this.attackTimer.start();
+    }
+  }
+
+  stopAttacking () {
+    if (this.attackTimer.running) {
+      this.attackTimer.stop(false);
+    }
+  }
+
+  kill () {
+    this.stopAttacking();
+    super.kill()
   }
 
   determineMovement () {

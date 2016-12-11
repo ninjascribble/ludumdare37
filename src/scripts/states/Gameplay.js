@@ -69,7 +69,6 @@ export default class Gameplay extends _State {
   }
 
   update () {
-    this.sunsetFilter.alpha = 1 - this.solarMeter.health / 100;
     this.sunsetFilter.update();
     this.game.physics.arcade.collide(this.player, this.enemies);
     this.game.physics.arcade.collide(this.player, this.book);
@@ -101,6 +100,8 @@ export default class Gameplay extends _State {
     if (this.solarMeter.health <= 0) {
       this.stateProvider.gameover(this.state);
     }
+
+    this.sunsetFilter.alpha = 1 - this.solarMeter.health / 100;
   }
 
   onSpellEnemyCollide (spell, enemy) {

@@ -1,36 +1,49 @@
 import _State from './_State';
 import DisplayObjects from '../display_objects';
+import GameObjects from '../game_objects';
 
 export default class Menu extends _State {
   create () {
-    this.stage.backgroundColor = '#AACCCC';
+    this.background = GameObjects.grass(this.game, 0, 0, this.world.width, this.world.height);
+    this.room = GameObjects.room(game, 120, 104);
+    this.book = GameObjects.book(game, 152, 124);
+
+    this.world.setBounds(0, 0, this.world.width, this.world.height);
+
     this.stage.disableVisibilityChange = true;
+
+    this.add.existing(this.background);
+    this.add.existing(this.room);
+    this.add.existing(this.book);
     this.add.existing(this.titleText());
     this.add.existing(this.alphabetText());
     this.add.existing(this.actionText());
   }
 
   titleText () {
-    return DisplayObjects.displayFont(game, 'THIS IS THE MENU', this.world.centerX, 100, 'center');
+    var text = DisplayObjects.displayFont(game, `
+THE HOUSE OF THE RISING SUN
+    `, this.world.centerX, 70, 'center');
+    text.maxWidth = 300;
+    return text;
   }
 
   alphabetText () {
-    var text = DisplayObjects.bodyFont(game, `
-AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz
-1,234,567,890 Ti Tj To 77 71 73 91910 .:;,
-!№;%:?*()_+-=.,/|"'@#$^&{}[]`, this.world.centerX, 145, 'center');
+    var text = DisplayObjects.bodyFont(game, ``, this.world.centerX, 145, 'center');
     text.maxWidth = 300;
     return text;
   }
 
   actionText () {
-    var text = DisplayObjects.bodyFont(game, 'Press Spacebar to Play!', this.world.centerX, 190, 'center');
+    var text = DisplayObjects.bodyFont(game, `
+Press ENTER to Play!
+    `, this.world.centerX, 200, 'center');
     this.time.events.loop(400, () => text.visible = !text.visible);
     return text;
   }
 
   update () {
-    if (this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+    if (this.input.keyboard.isDown(Phaser.Keyboard.ENTER)) {
       this.stateProvider.gameplay(this.state);
     }
   }
