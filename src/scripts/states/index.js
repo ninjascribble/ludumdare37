@@ -2,6 +2,7 @@ import Gameplay from './Gameplay';
 import Gameover from './Gameover';
 import Loading from './Loading';
 import Menu from './Menu';
+import Story from './Story';
 
 module.exports = {
   loading: function loading (stateManager) {
@@ -18,6 +19,10 @@ module.exports = {
 
   gameover: function gameover (stateManager) {
     changeState(stateManager, Gameover);
+  },
+
+  story: function story (stateManager) {
+    changeState(stateManager, Story);
   }
 };
 

@@ -90,6 +90,10 @@
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
+	var _Story = __webpack_require__(21);
+	
+	var _Story2 = _interopRequireDefault(_Story);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	module.exports = {
@@ -107,6 +111,10 @@
 	
 	  gameover: function gameover(stateManager) {
 	    changeState(stateManager, _Gameover2.default);
+	  },
+	
+	  story: function story(stateManager) {
+	    changeState(stateManager, _Story2.default);
 	  }
 	};
 	
@@ -1673,7 +1681,7 @@
 	    key: 'update',
 	    value: function update() {
 	      if (this.input.keyboard.isDown(Phaser.Keyboard.ENTER)) {
-	        this.stateProvider.gameplay(this.state);
+	        this.stateProvider.story(this.state);
 	      }
 	    }
 	  }]);
@@ -1682,6 +1690,102 @@
 	}(_State4.default);
 	
 	exports.default = Menu;
+
+/***/ },
+/* 21 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _State3 = __webpack_require__(3);
+	
+	var _State4 = _interopRequireDefault(_State3);
+	
+	var _display_objects = __webpack_require__(9);
+	
+	var _display_objects2 = _interopRequireDefault(_display_objects);
+	
+	var _game_objects = __webpack_require__(4);
+	
+	var _game_objects2 = _interopRequireDefault(_game_objects);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Story = function (_State2) {
+	  _inherits(Story, _State2);
+	
+	  function Story() {
+	    _classCallCheck(this, Story);
+	
+	    return _possibleConstructorReturn(this, (Story.__proto__ || Object.getPrototypeOf(Story)).apply(this, arguments));
+	  }
+	
+	  _createClass(Story, [{
+	    key: 'create',
+	    value: function create() {
+	      this.background = _game_objects2.default.grass(this.game, 0, 0, this.world.width, this.world.height);
+	      this.room = _game_objects2.default.room(game, 120, 104);
+	      this.book = _game_objects2.default.book(game, 152, 124);
+	
+	      this.world.setBounds(0, 0, this.world.width, this.world.height);
+	
+	      this.stage.disableVisibilityChange = true;
+	
+	      this.add.existing(this.background);
+	      this.add.existing(this.room);
+	      this.add.existing(this.book);
+	      this.add.existing(this.alphabetText());
+	      this.add.existing(this.instructionText());
+	      this.add.existing(this.actionText());
+	    }
+	  }, {
+	    key: 'alphabetText',
+	    value: function alphabetText() {
+	      var text = _display_objects2.default.bodyFont(game, '\nYou are a wizard who must fight against the coming night by reading from your Tome of the Sun. But a horde of vampires wants nothing more than to send the world into perpetual darkness.\n\nKeep the sun high by defending your reading room against the vampires. Don\'t let the sun set!\n    ', this.world.centerX, 54, 'center');
+	      text.maxWidth = 300;
+	      return text;
+	    }
+	  }, {
+	    key: 'instructionText',
+	    value: function instructionText() {
+	      var text = _display_objects2.default.bodyFont(game, '\nUse the ARROW KEYS to move\nand press SPACEBAR to attack. Good luck!\n    ', this.world.centerX, 212, 'center');
+	      text.maxWidth = 300;
+	      return text;
+	    }
+	  }, {
+	    key: 'actionText',
+	    value: function actionText() {
+	      var text = _display_objects2.default.bodyFont(game, '\nPress ENTER to Play!\n    ', this.world.centerX, 254, 'center');
+	      this.time.events.loop(400, function () {
+	        return text.visible = !text.visible;
+	      });
+	      return text;
+	    }
+	  }, {
+	    key: 'update',
+	    value: function update() {
+	      if (this.input.keyboard.isDown(Phaser.Keyboard.ENTER)) {
+	        this.stateProvider.gameplay(this.state);
+	      }
+	    }
+	  }]);
+	
+	  return Story;
+	}(_State4.default);
+	
+	exports.default = Story;
 
 /***/ }
 /******/ ]);
