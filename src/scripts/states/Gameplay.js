@@ -1,6 +1,7 @@
 import _State from './_State';
 import GameObjects from '../game_objects';
 import DisplayObjects from '../display_objects';
+import Sounds from '../sounds';
 import '../filters/Sunset';
 
 export default class Gameplay extends _State {
@@ -72,6 +73,7 @@ export default class Gameplay extends _State {
 
     this.spacebar.onDown.add(() => {
       this.spells.spawnSpellAt(this.player.x + 8, this.player.y + 8, this.player.facing);
+      Sounds.spell(this.game.sound);
     }, this);
   }
 

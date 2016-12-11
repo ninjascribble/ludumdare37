@@ -78,19 +78,19 @@
 	
 	var _Gameplay2 = _interopRequireDefault(_Gameplay);
 	
-	var _Gameover = __webpack_require__(18);
+	var _Gameover = __webpack_require__(19);
 	
 	var _Gameover2 = _interopRequireDefault(_Gameover);
 	
-	var _Loading = __webpack_require__(19);
+	var _Loading = __webpack_require__(20);
 	
 	var _Loading2 = _interopRequireDefault(_Loading);
 	
-	var _Menu = __webpack_require__(20);
+	var _Menu = __webpack_require__(21);
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
-	var _Story = __webpack_require__(21);
+	var _Story = __webpack_require__(22);
 	
 	var _Story2 = _interopRequireDefault(_Story);
 	
@@ -158,7 +158,11 @@
 	
 	var _display_objects2 = _interopRequireDefault(_display_objects);
 	
-	__webpack_require__(17);
+	var _sounds = __webpack_require__(17);
+	
+	var _sounds2 = _interopRequireDefault(_sounds);
+	
+	__webpack_require__(18);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -237,6 +241,7 @@
 	
 	      this.spacebar.onDown.add(function () {
 	        _this2.spells.spawnSpellAt(_this2.player.x + 8, _this2.player.y + 8, _this2.player.facing);
+	        _sounds2.default.spell(_this2.game.sound);
 	      }, this);
 	    }
 	  }, {
@@ -1385,6 +1390,24 @@
 /* 17 */
 /***/ function(module, exports) {
 
+	'use strict';
+	
+	var SPELL = 'spell';
+	
+	module.exports = {
+	  load: function load(loader) {
+	    loader.load.audio(SPELL, 'spell.wav', true);
+	  },
+	
+	  spell: function spell(player) {
+	    player.play(SPELL);
+	  }
+	};
+
+/***/ },
+/* 18 */
+/***/ function(module, exports) {
+
 	"use strict";
 	
 	Phaser.Filter.Sunset = function (game) {
@@ -1415,7 +1438,7 @@
 	});
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1438,7 +1461,7 @@
 	
 	var _game_objects2 = _interopRequireDefault(_game_objects);
 	
-	__webpack_require__(17);
+	__webpack_require__(18);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -1518,7 +1541,7 @@
 	exports.default = Gameover;
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1540,6 +1563,10 @@
 	var _game_objects = __webpack_require__(4);
 	
 	var _game_objects2 = _interopRequireDefault(_game_objects);
+	
+	var _sounds = __webpack_require__(17);
+	
+	var _sounds2 = _interopRequireDefault(_sounds);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -1582,6 +1609,7 @@
 	    value: function preload() {
 	      _display_objects2.default.load(this);
 	      _game_objects2.default.load(this);
+	      _sounds2.default.load(this);
 	    }
 	
 	    // create() is automagically triggerd after preload completes
@@ -1599,7 +1627,7 @@
 	exports.default = Loading;
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1695,7 +1723,7 @@
 	exports.default = Menu;
 
 /***/ },
-/* 21 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
