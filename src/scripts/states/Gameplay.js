@@ -5,6 +5,7 @@ import '../filters/Sunset';
 
 export default class Gameplay extends _State {
   create () {
+    this.startAt = Date.now();
     this.background = GameObjects.grass(this.game, 0, 0, this.world.width, this.world.height);
     this.sunsetFilter = game.add.filter('Sunset');
     this.world.setBounds(0, 0, this.world.width, this.world.height);
@@ -30,6 +31,11 @@ export default class Gameplay extends _State {
       { x: this.world.centerX, y: this.world.height + 16 },
       { x: this.world.width + 16, y: this.world.height + 16 }
     ]);
+
+    this.game.scores = {
+      enemiesKilled: 0,
+      timeElapsed: 0,
+    };
 
     this.add.existing(this.background);
     this.add.existing(this.room);
@@ -73,7 +79,7 @@ export default class Gameplay extends _State {
     this.game.physics.arcade.collide(this.player, this.enemies);
     this.game.physics.arcade.collide(this.player, this.book);
     this.game.physics.arcade.collide(this.enemies, this.enemies);
-    this.game.physics.arcade.overlap(this.spells, this.enemies, this.onSpellEnemyCollide)
+    this.game.physics.arcade.overlap(this.spells, this.enemies, this.onSpellEnemyCollide.bind(this))
 
     if (this.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
       this.player.moveLeft();
@@ -98,13 +104,17 @@ export default class Gameplay extends _State {
     }
 
     if (this.solarMeter.health <= 0) {
-      this.stateProvider.gameover(this.state);
+      this.game.scores.timeElapsed = Date.now() - this.startAt;
+      this.stateProvider.gameover(this.state, this.scoring);
     }
 
     this.sunsetFilter.alpha = 1 - this.solarMeter.health / 100;
+    this.solarMeter.kills = this.game.scores.enemiesKilled;
+    this.solarMeter.time = Date.now() - this.startAt;
   }
 
   onSpellEnemyCollide (spell, enemy) {
-    enemy.kill()
+    this.game.scores.enemiesKilled++;
+    enemy.kill();
   }
 }

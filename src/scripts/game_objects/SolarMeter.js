@@ -11,6 +11,8 @@ export default class SolarMeter extends Phaser.Group {
   constructor (game, parent, name) {
     super(game, parent, name);
     this.health = MAX_HEALTH;
+    this.kills = 0;
+    this.time = 0;
 
     this.drainTimer = this.game.time.create();
     this.drainTimer.loop(DRAIN_DELAY, () => this.drain(), this);
@@ -18,12 +20,16 @@ export default class SolarMeter extends Phaser.Group {
     this.chargeTimer = this.game.time.create();
     this.chargeTimer.loop(CHARGE_DELAY, () => this.charge(), this);
 
-    this.hud = DisplayObjects.bodyFont(this.game, this.health, 16, 16);
+    this.hud = DisplayObjects.bodyFont(this.game, this.mkhealth(this.health), 16, 16);
+    this.killCounter = DisplayObjects.bodyFont(this.game, this.mkkills(this.kills), 160, 16, 'center');
+    this.timeCounter = DisplayObjects.bodyFont(this.game, this.mktime(this.time), 304, 16, 'right');
 
     this.onStartDraining = new Phaser.Signal();
     this.onStartCharging = new Phaser.Signal();
 
     this.add(this.hud);
+    this.add(this.killCounter);
+    this.add(this.timeCounter);
   }
 
   draining () {
@@ -57,6 +63,29 @@ export default class SolarMeter extends Phaser.Group {
   }
 
   update () {
-    this.hud.text = this.health;
+    this.hud.text = this.mkhealth(this.health);
+    this.killCounter.text = this.mkkills(this.kills);
+    this.timeCounter.text = this.mktime(this.time);
+  }
+
+  mkhealth (num) {
+    return num + ' sols';
+  }
+
+  mkkills (num) {
+    return num + ' kills';
+  }
+
+  mktime (ms) {
+    let dt = new Date(ms);
+    let hours = String(16 - dt.getHours());
+    let minutes = String(dt.getMinutes());
+    let seconds = String(dt.getSeconds());
+
+    if (hours.length < 2) hours = '0' + hours;
+    if (minutes.length < 2) minutes = '0' + minutes;
+    if (seconds.length < 2) seconds = '0' + seconds;
+
+    return [hours, minutes, seconds].join(':')
   }
 }

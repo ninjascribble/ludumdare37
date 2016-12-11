@@ -9,6 +9,7 @@ export default class Gameover extends _State {
     this.sunsetFilter = game.add.filter('Sunset');
     this.room = GameObjects.room(game, 120, 104);
     this.book = GameObjects.book(game, 152, 124);
+    this.solarMeter = GameObjects.solarMeter(game);
 
     this.world.setBounds(0, 0, this.world.width, this.world.height);
 
@@ -19,10 +20,18 @@ export default class Gameover extends _State {
     this.add.existing(this.book);
     this.add.existing(this.titleText());
     this.add.existing(this.actionText());
+    this.add.existing(this.solarMeter);
+
+    this.game.world.bringToTop(this.solarMeter);
 
     game.world.filters = [this.sunsetFilter];
     this.sunsetFilter.alpha = 1;
     this.sunsetFilter.update();
+
+    this.solarMeter.health = 0;
+    this.solarMeter.kills = this.game.scores.enemiesKilled;
+    this.solarMeter.time = this.game.scores.timeElapsed;
+    this.solarMeter.update();
   }
 
   titleText () {
