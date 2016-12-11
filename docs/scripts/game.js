@@ -983,7 +983,7 @@
 	    key: 'mktime',
 	    value: function mktime(ms) {
 	      var dt = new Date(ms);
-	      var hours = String(16 - dt.getHours());
+	      var hours = '00'; // String(16 - dt.getHours());
 	      var minutes = String(dt.getMinutes());
 	      var seconds = String(dt.getSeconds());
 	
@@ -1335,7 +1335,13 @@
 	    _this.body.immovable = true;
 	    _this.body.height = 2;
 	    _this.animations.add('open', [0, 1, 2, 3], 12, false);
+	    _this.animations.add('stayOpen', [3], 12, false);
 	    _this.animations.add('close', [4, 5, 6, 7], 12, false);
+	    _this.animations.add('stayClosed', [7], 12, false);
+	    _this.animations.add('burnClosed', [8, 9], 12, true);
+	    _this.animations.add('burnOpen', [10, 11], 12, true);
+	
+	    _this.playerPresent = false;
 	    return _this;
 	  }
 	
@@ -1348,6 +1354,24 @@
 	    key: 'close',
 	    value: function close() {
 	      this.animations.play('close');
+	    }
+	  }, {
+	    key: 'burn',
+	    value: function burn() {
+	      if (this.playerPresent == true) {
+	        this.animations.play('burnOpen');
+	      } else {
+	        this.animations.play('burnClosed');
+	      }
+	    }
+	  }, {
+	    key: 'stopBurning',
+	    value: function stopBurning() {
+	      if (this.playerPresent == true) {
+	        this.animations.play('stayOpen');
+	      } else {
+	        this.animations.play('stayClosed');
+	      }
 	    }
 	  }]);
 	

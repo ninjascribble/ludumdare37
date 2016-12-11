@@ -82,7 +82,7 @@ export default class SolarMeter extends Phaser.Group {
 
   mktime (ms) {
     let dt = new Date(ms);
-    let hours = String(16 - dt.getHours());
+    let hours = '00'; // String(16 - dt.getHours());
     let minutes = String(dt.getMinutes());
     let seconds = String(dt.getSeconds());
 
