@@ -180,7 +180,8 @@
 	      this.book = _game_objects2.default.book(game, 160, 144);
 	      this.solarMeter = _game_objects2.default.solarMeter(game);
 	      this.enemies = _game_objects2.default.enemies(game);
-	      this.enemies.setSpawnPoints([{ x: -16, y: -16 }, { x: -16, y: this.world.centerY }, { x: -16, y: this.world.height + 16 }, { x: this.world.width + 16, y: -16 }, { x: this.world.width + 16, y: this.world.centerY }, { x: this.world.width + 16, y: this.world.height + 16 }, { x: -16, y: -16 }, { x: this.world.centerX, y: -16 }, { x: this.world.with + 16, y: -16 }, { x: -16, y: this.world.height + 16 }, { x: this.world.centerX, y: this.world.height + 16 }, { x: this.world.with + 16, y: this.world.height + 16 }]);
+	      this.enemies.setTarget(this.book);
+	      this.enemies.setSpawnPoints([{ x: -16, y: -16 }, { x: -16, y: this.world.centerY }, { x: -16, y: this.world.height + 16 }, { x: this.world.width + 16, y: -16 }, { x: this.world.width + 16, y: this.world.centerY }, { x: this.world.width + 16, y: this.world.height + 16 }, { x: -16, y: -16 }, { x: this.world.centerX, y: -16 }, { x: this.world.width + 16, y: -16 }, { x: -16, y: this.world.height + 16 }, { x: this.world.centerX, y: this.world.height + 16 }, { x: this.world.width + 16, y: this.world.height + 16 }]);
 	
 	      this.add.existing(this.room);
 	      this.add.existing(this.book);
@@ -199,6 +200,10 @@
 	      this.solarMeter.onStartCharging.add(function () {
 	        _this2.book.open();
 	      }, this);
+	
+	      this.enemies.onEnterTargetZone.add(function () {
+	        _this2.solarMeter.health--;
+	      }, this);
 	    }
 	  }, {
 	    key: 'update',
@@ -206,7 +211,6 @@
 	      this.game.physics.arcade.overlap(this.player, this.enemies, this.onPlayerEnemyCollide);
 	      this.game.physics.arcade.collide(this.player, this.book);
 	      this.game.physics.arcade.collide(this.enemies, this.enemies);
-	      this.game.physics.arcade.collide(this.room, this.enemies);
 	
 	      if (this.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
 	        this.player.moveLeft();
@@ -504,7 +508,10 @@
 	  function Enemies(game, parent, name) {
 	    _classCallCheck(this, Enemies);
 	
-	    return _possibleConstructorReturn(this, (Enemies.__proto__ || Object.getPrototypeOf(Enemies)).call(this, game, parent, name));
+	    var _this = _possibleConstructorReturn(this, (Enemies.__proto__ || Object.getPrototypeOf(Enemies)).call(this, game, parent, name));
+	
+	    _this.onEnterTargetZone = new Phaser.Signal();
+	    return _this;
 	  }
 	
 	  _createClass(Enemies, [{
@@ -516,6 +523,11 @@
 	    key: "setSpawnPoints",
 	    value: function setSpawnPoints(spawnPoints) {
 	      this.spawnPoints = spawnPoints;
+	    }
+	  }, {
+	    key: "setTarget",
+	    value: function setTarget(target) {
+	      this.target = target;
 	    }
 	  }, {
 	    key: "startMoveTimer",
@@ -561,7 +573,8 @@
 	
 	      alien.x = x;
 	      alien.y = y;
-	      alien.body.collideWorldBounds = false;
+	      alien.target = this.target;
+	      alien.onEnterTargetZone = this.onEnterTargetZone;
 	      alien.revive();
 	      this.add(alien);
 	    }
@@ -610,21 +623,24 @@
 	    _this.body.drag.y = 1000;
 	
 	    _this.body.onCollide = new Phaser.Signal();
-	    _this.body.collideWorldBounds = true;
 	
 	    _this.animations.add('walkDown', [0, 1, 0, 2], 6, true);
 	    _this.animations.add('walkUp', [3, 4, 3, 5], 6, true);
 	    _this.animations.add('walkRight', [6, 7, 6, 8], 6, true);
 	    _this.animations.add('walkLeft', [9, 10, 9, 11], 6, true);
+	
+	    _this.target = null;
+	    _this.onEnterTargetZone = null;
 	    return _this;
 	  }
 	
 	  _createClass(Alien, [{
 	    key: 'update',
 	    value: function update() {
-	      if (this.body.velocity.x == 0 && this.body.velocity.y == 0) {
-	        this.animations.currentAnim.restart();
-	        this.animations.stop();
+	      if (this.target && this.overlap(this.target)) {
+	        this.body.velocity.x = 0;
+	        this.body.velocity.y = 0;
+	        this.onEnterTargetZone && this.onEnterTargetZone.dispatch();
 	      }
 	    }
 	  }, {

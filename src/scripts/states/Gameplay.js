@@ -12,6 +12,7 @@ export default class Gameplay extends _State {
     this.book = GameObjects.book(game, 160, 144);
     this.solarMeter = GameObjects.solarMeter(game);
     this.enemies = GameObjects.enemies(game);
+    this.enemies.setTarget(this.book);
     this.enemies.setSpawnPoints([
       { x: -16, y: -16 },
       { x: -16, y: this.world.centerY },
@@ -21,10 +22,10 @@ export default class Gameplay extends _State {
       { x: this.world.width + 16, y: this.world.height + 16 },
       { x: -16, y: -16 },
       { x: this.world.centerX, y: -16 },
-      { x: this.world.with + 16, y: -16 },
+      { x: this.world.width + 16, y: -16 },
       { x: -16, y: this.world.height + 16 },
       { x: this.world.centerX, y: this.world.height + 16 },
-      { x: this.world.with + 16, y: this.world.height + 16 }
+      { x: this.world.width + 16, y: this.world.height + 16 }
     ]);
 
     this.add.existing(this.room);
@@ -44,13 +45,16 @@ export default class Gameplay extends _State {
     this.solarMeter.onStartCharging.add(() => {
       this.book.open();
     }, this);
+
+    this.enemies.onEnterTargetZone.add(() => {
+      this.solarMeter.health--;
+    }, this);
   }
 
   update () {
     this.game.physics.arcade.overlap(this.player, this.enemies, this.onPlayerEnemyCollide);
     this.game.physics.arcade.collide(this.player, this.book);
     this.game.physics.arcade.collide(this.enemies, this.enemies);
-    this.game.physics.arcade.collide(this.room, this.enemies);
 
     if (this.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
       this.player.moveLeft();

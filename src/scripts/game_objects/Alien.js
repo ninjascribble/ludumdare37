@@ -14,18 +14,21 @@ export default class Alien extends Phaser.Sprite {
     this.body.drag.y = 1000;
 
     this.body.onCollide = new Phaser.Signal();
-    this.body.collideWorldBounds = true;
 
     this.animations.add('walkDown', [0, 1, 0, 2], 6, true);
     this.animations.add('walkUp', [3, 4, 3, 5], 6, true);
     this.animations.add('walkRight', [6, 7, 6, 8], 6, true);
     this.animations.add('walkLeft', [9, 10, 9, 11], 6, true);
+
+    this.target = null;
+    this.onEnterTargetZone = null;
   }
 
   update () {
-    if (this.body.velocity.x == 0 && this.body.velocity.y == 0) {
-      this.animations.currentAnim.restart();
-      this.animations.stop();
+    if (this.target && this.overlap(this.target)) {
+      this.body.velocity.x = 0;
+      this.body.velocity.y = 0;
+      this.onEnterTargetZone && this.onEnterTargetZone.dispatch();
     }
   }
 

@@ -4,6 +4,7 @@ const SPAWN_DELAY = 200;
 export default class Enemies extends Phaser.Group {
   constructor (game, parent, name) {
     super(game, parent, name);
+    this.onEnterTargetZone = new Phaser.Signal();
   }
 
   setAlienBuilder (builder) {
@@ -12,6 +13,10 @@ export default class Enemies extends Phaser.Group {
 
   setSpawnPoints (spawnPoints) {
     this.spawnPoints = spawnPoints;
+  }
+
+  setTarget (target) {
+    this.target = target;
   }
 
   startMoveTimer () {
@@ -45,7 +50,8 @@ export default class Enemies extends Phaser.Group {
 
     alien.x = x;
     alien.y = y;
-    alien.body.collideWorldBounds = false;
+    alien.target = this.target;
+    alien.onEnterTargetZone = this.onEnterTargetZone;
     alien.revive()
     this.add(alien)
   }
