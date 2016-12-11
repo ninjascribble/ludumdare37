@@ -1364,6 +1364,12 @@
 	
 	var _display_objects2 = _interopRequireDefault(_display_objects);
 	
+	var _game_objects = __webpack_require__(4);
+	
+	var _game_objects2 = _interopRequireDefault(_game_objects);
+	
+	__webpack_require__(17);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1384,20 +1390,34 @@
 	  _createClass(Gameover, [{
 	    key: 'create',
 	    value: function create() {
-	      // this.stage.backgroundColor = '#AACCCC';
+	      this.background = _game_objects2.default.grass(this.game, 0, 0, this.world.width, this.world.height);
+	      this.sunsetFilter = game.add.filter('Sunset');
+	      this.room = _game_objects2.default.room(game, 120, 104);
+	      this.book = _game_objects2.default.book(game, 152, 124);
+	
+	      this.world.setBounds(0, 0, this.world.width, this.world.height);
+	
 	      this.stage.disableVisibilityChange = true;
+	
+	      this.add.existing(this.background);
+	      this.add.existing(this.room);
+	      this.add.existing(this.book);
 	      this.add.existing(this.titleText());
 	      this.add.existing(this.actionText());
+	
+	      game.world.filters = [this.sunsetFilter];
+	      this.sunsetFilter.alpha = 1;
+	      this.sunsetFilter.update();
 	    }
 	  }, {
 	    key: 'titleText',
 	    value: function titleText() {
-	      return _display_objects2.default.displayFont(game, 'Game Over', this.world.centerX, 100, 'center');
+	      return _display_objects2.default.displayFont(game, 'Game Over', this.world.centerX, 80, 'center');
 	    }
 	  }, {
 	    key: 'actionText',
 	    value: function actionText() {
-	      var text = _display_objects2.default.bodyFont(game, 'Press Spacebar to Play!', this.world.centerX, 190, 'center');
+	      var text = _display_objects2.default.bodyFont(game, 'Press ENTER to Play!', this.world.centerX, 200, 'center');
 	      this.time.events.loop(400, function () {
 	        return text.visible = !text.visible;
 	      });
@@ -1406,7 +1426,7 @@
 	  }, {
 	    key: 'update',
 	    value: function update() {
-	      if (this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+	      if (this.input.keyboard.isDown(Phaser.Keyboard.ENTER)) {
 	        this.stateProvider.gameplay(this.state);
 	      }
 	    }
