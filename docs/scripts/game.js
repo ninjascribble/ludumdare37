@@ -198,9 +198,7 @@
 	      this.book = _game_objects2.default.book(game, 152, 124);
 	      this.room = _game_objects2.default.room(game, 120, 104);
 	      this.enemies.setTarget(this.book);
-	      this.enemies.setSpawnPoints([
-	      //{ x: 50, y: 50}, {x: 200, y: 50}
-	      { x: -16, y: -16 }, { x: -16, y: this.world.centerY }, { x: -16, y: this.world.height + 16 }, { x: this.world.width + 16, y: -16 }, { x: this.world.width + 16, y: this.world.centerY }, { x: this.world.width + 16, y: this.world.height + 16 }, { x: -16, y: -16 }, { x: this.world.centerX, y: -16 }, { x: this.world.width + 16, y: -16 }, { x: -16, y: this.world.height + 16 }, { x: this.world.centerX, y: this.world.height + 16 }, { x: this.world.width + 16, y: this.world.height + 16 }]);
+	      this.enemies.setSpawnPoints([{ x: -16, y: -16 }, { x: -16, y: this.world.centerY }, { x: -16, y: this.world.height + 16 }, { x: this.world.width + 16, y: -16 }, { x: this.world.width + 16, y: this.world.centerY }, { x: this.world.width + 16, y: this.world.height + 16 }, { x: -16, y: -16 }, { x: this.world.centerX, y: -16 }, { x: this.world.width + 16, y: -16 }, { x: -16, y: this.world.height + 16 }, { x: this.world.centerX, y: this.world.height + 16 }, { x: this.world.width + 16, y: this.world.height + 16 }]);
 	
 	      this.game.scores = {
 	        enemiesKilled: 0,
@@ -238,14 +236,19 @@
 	        _this2.book.open();
 	      }, this);
 	
-	      this.enemies.onEnterTargetZone.add(function () {
-	        _this2.solarMeter.health--;
-	      }, this);
-	
 	      this.spacebar.onDown.add(function () {
 	        _this2.spells.spawnSpellAt(_this2.player.x + 8, _this2.player.y + 8, _this2.player.facing);
 	        _sounds2.default.spell(_this2.game.sound);
 	      }, this);
+	
+	      this.attackTimer = this.game.time.create();
+	      this.attackTimer.loop(200, function () {
+	        _this2.enemies.forEachAlive(function (enemy) {
+	          if (enemy.isVampire) _this2.solarMeter.health -= 5;
+	        }, _this2);
+	      }, this);
+	
+	      this.attackTimer.start();
 	    }
 	  }, {
 	    key: 'update',
@@ -254,6 +257,7 @@
 	      this.game.physics.arcade.collide(this.player, this.enemies);
 	      this.game.physics.arcade.collide(this.player, this.book);
 	      this.game.physics.arcade.collide(this.enemies, this.enemies);
+	      this.game.physics.arcade.collide(this.enemies, this.book);
 	      this.game.physics.arcade.overlap(this.spells, this.enemies, this.onSpellEnemyCollide.bind(this));
 	
 	      if (this.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
@@ -610,7 +614,6 @@
 	
 	    var _this = _possibleConstructorReturn(this, (Enemies.__proto__ || Object.getPrototypeOf(Enemies)).call(this, game, parent, name));
 	
-	    _this.onEnterTargetZone = new Phaser.Signal();
 	    _this.itteration = 1;
 	    return _this;
 	  }
@@ -670,16 +673,11 @@
 	  }, {
 	    key: "spawnAlienAt",
 	    value: function spawnAlienAt(x, y) {
-	      if (this.countLiving() > 500) {
-	        return;
-	      }
-	
 	      var alien = this.getFirstDead() || this.alienBuilder(game);
 	
 	      alien.x = x;
 	      alien.y = y;
 	      alien.target = this.target;
-	      alien.onEnterTargetZone = this.onEnterTargetZone;
 	      alien.revive();
 	      this.add(alien);
 	    }
@@ -738,44 +736,15 @@
 	    _this.animations.add('vampire', [8, 9, 10, 11], 6, true);
 	
 	    _this.target = null;
-	    _this.onEnterTargetZone = null;
-	    _this.attackTimer = _this.game.time.create();
-	    _this.attackTimer.loop(100, function () {
-	      _this.onEnterTargetZone && _this.onEnterTargetZone.dispatch();
-	    }, _this);
+	    _this.isVampire = false;
 	    return _this;
 	  }
 	
 	  _createClass(Alien, [{
-	    key: 'update',
-	    value: function update() {
-	      if (this.target && this.overlap(this.target)) {
-	        this.body.velocity.x = 0;
-	        this.body.velocity.y = 0;
-	        this.startAttacking();
-	      } else {
-	        this.stopAttacking();
-	      }
-	    }
-	  }, {
-	    key: 'startAttacking',
-	    value: function startAttacking() {
-	      if (!this.attackTimer.running) {
-	        this.attackTimer.start();
-	      }
-	    }
-	  }, {
-	    key: 'stopAttacking',
-	    value: function stopAttacking() {
-	      if (this.attackTimer.running) {
-	        this.attackTimer.stop(false);
-	      }
-	    }
-	  }, {
-	    key: 'kill',
-	    value: function kill() {
-	      this.stopAttacking();
-	      _get(Alien.prototype.__proto__ || Object.getPrototypeOf(Alien.prototype), 'kill', this).call(this);
+	    key: 'revive',
+	    value: function revive() {
+	      _get(Alien.prototype.__proto__ || Object.getPrototypeOf(Alien.prototype), 'revive', this).call(this);
+	      this.isVampire = false;
 	    }
 	  }, {
 	    key: 'determineMovement',
@@ -786,12 +755,14 @@
 	
 	      //If the enemy isn't next to the book then procede with movement
 	      if (Math.abs(xDiff) > 32 || Math.abs(yDiff) > 32) {
+	        this.isVampire = false;
 	        if (randNum > 30) {
-	          this.moveToBook(xDiff, yDiff);
+	          this.moveToTarget(xDiff, yDiff);
 	        } else {
 	          this.travel();
 	        }
 	      } else {
+	        this.isVampire = true;
 	        this.animations.play('vampire');
 	      }
 	    }
@@ -822,8 +793,8 @@
 	    //Move the enemy towards the book.
 	
 	  }, {
-	    key: 'moveToBook',
-	    value: function moveToBook(xDiff, yDiff) {
+	    key: 'moveToTarget',
+	    value: function moveToTarget(xDiff, yDiff) {
 	      if (xDiff > 0) {
 	        this.moveRight();
 	      } else {

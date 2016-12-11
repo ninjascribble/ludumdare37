@@ -22,38 +22,12 @@ export default class Alien extends Phaser.Sprite {
     this.animations.add('vampire', [8, 9, 10, 11], 6, true);
 
     this.target = null;
-    this.onEnterTargetZone = null;
-    this.attackTimer = this.game.time.create();
-    this.attackTimer.loop(100, () => {
-      this.onEnterTargetZone && this.onEnterTargetZone.dispatch();
-    }, this);
+    this.isVampire = false;
   }
 
-  update () {
-    if (this.target && this.overlap(this.target)) {
-      this.body.velocity.x = 0;
-      this.body.velocity.y = 0;
-      this.startAttacking();
-    } else {
-      this.stopAttacking();
-    }
-  }
-
-  startAttacking () {
-    if (!this.attackTimer.running) {
-      this.attackTimer.start();
-    }
-  }
-
-  stopAttacking () {
-    if (this.attackTimer.running) {
-      this.attackTimer.stop(false);
-    }
-  }
-
-  kill () {
-    this.stopAttacking();
-    super.kill()
+  revive () {
+    super.revive();
+    this.isVampire = false;
   }
 
   determineMovement () {
@@ -63,13 +37,14 @@ export default class Alien extends Phaser.Sprite {
 
     //If the enemy isn't next to the book then procede with movement
     if (Math.abs(xDiff) > 32 ||  Math.abs(yDiff) > 32){
+      this.isVampire = false;
       if(randNum > 30){
-        this.moveToBook(xDiff, yDiff);
-      }
-      else{
+        this.moveToTarget(xDiff, yDiff);
+      } else{
         this.travel();
       }
     } else {
+      this.isVampire = true;
       this.animations.play('vampire');
     }
   }
@@ -91,7 +66,7 @@ export default class Alien extends Phaser.Sprite {
   }
 
   //Move the enemy towards the book.
-  moveToBook(xDiff, yDiff){
+  moveToTarget(xDiff, yDiff){
     if(xDiff > 0) {
       this.moveRight();
     }

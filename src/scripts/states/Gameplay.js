@@ -19,7 +19,6 @@ export default class Gameplay extends _State {
     this.room = GameObjects.room(game, 120, 104);
     this.enemies.setTarget(this.book);
     this.enemies.setSpawnPoints([
-      //{ x: 50, y: 50}, {x: 200, y: 50}
       { x: -16, y: -16 },
       { x: -16, y: this.world.centerY },
       { x: -16, y: this.world.height + 16 },
@@ -70,14 +69,19 @@ export default class Gameplay extends _State {
       this.book.open();
     }, this);
 
-    this.enemies.onEnterTargetZone.add(() => {
-      this.solarMeter.health--;
-    }, this);
-
     this.spacebar.onDown.add(() => {
       this.spells.spawnSpellAt(this.player.x + 8, this.player.y + 8, this.player.facing);
       Sounds.spell(this.game.sound);
     }, this);
+
+    this.attackTimer = this.game.time.create();
+    this.attackTimer.loop(200, () => {
+      this.enemies.forEachAlive((enemy) => {
+        if (enemy.isVampire) this.solarMeter.health -= 5;
+      }, this);
+    }, this);
+
+    this.attackTimer.start();
   }
 
   update () {
@@ -85,6 +89,7 @@ export default class Gameplay extends _State {
     this.game.physics.arcade.collide(this.player, this.enemies);
     this.game.physics.arcade.collide(this.player, this.book);
     this.game.physics.arcade.collide(this.enemies, this.enemies);
+    this.game.physics.arcade.collide(this.enemies, this.book);
     this.game.physics.arcade.overlap(this.spells, this.enemies, this.onSpellEnemyCollide.bind(this))
 
     if (this.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
