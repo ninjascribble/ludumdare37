@@ -172,22 +172,24 @@
 	    value: function create() {
 	      var _this2 = this;
 	
-	      this.stage.backgroundColor = '#223344';
+	      this.stage.backgroundColor = '#a3ce27';
 	      this.world.setBounds(0, 0, this.world.width, this.world.height);
 	      this.player = _game_objects2.default.player(game, this.world.centerX, 60);
-	
-	      this.room = _game_objects2.default.room(game);
-	      this.book = _game_objects2.default.book(game, 160, 144);
 	      this.solarMeter = _game_objects2.default.solarMeter(game);
 	      this.enemies = _game_objects2.default.enemies(game);
+	      this.book = _game_objects2.default.book(game, 152, 124);
+	      this.room = _game_objects2.default.room(game, 120, 104);
 	      this.enemies.setTarget(this.book);
 	      this.enemies.setSpawnPoints([{ x: -16, y: -16 }, { x: -16, y: this.world.centerY }, { x: -16, y: this.world.height + 16 }, { x: this.world.width + 16, y: -16 }, { x: this.world.width + 16, y: this.world.centerY }, { x: this.world.width + 16, y: this.world.height + 16 }, { x: -16, y: -16 }, { x: this.world.centerX, y: -16 }, { x: this.world.width + 16, y: -16 }, { x: -16, y: this.world.height + 16 }, { x: this.world.centerX, y: this.world.height + 16 }, { x: this.world.width + 16, y: this.world.height + 16 }]);
 	
 	      this.add.existing(this.room);
 	      this.add.existing(this.book);
-	      this.add.existing(this.player);
 	      this.add.existing(this.enemies);
+	      this.add.existing(this.player);
 	      this.add.existing(this.solarMeter);
+	
+	      this.game.world.bringToTop(this.enemies);
+	      this.game.world.bringToTop(this.solarMeter);
 	
 	      this.enemies.startMoveTimer();
 	      this.enemies.startSpawnTimer();
@@ -339,17 +341,15 @@
 	    loader.load.spritesheet(ALIEN, 'alien.png', 16, 16);
 	    loader.load.spritesheet(BRICK, 'brick.png', 16, 16);
 	    loader.load.spritesheet(BOOK, 'book.png', 16, 16);
+	    loader.load.spritesheet(ROOM, 'room.png', 80, 80);
 	  },
 	
 	  player: function player(game, x, y) {
 	    return new _Player2.default(game, x, y, PLAYER);
 	  },
 	
-	  room: function room(game, parent) {
-	    var group = new _Room2.default(game, parent, ROOM);
-	    group.setBrickBuilder(module.exports.brick);
-	    group.buildAll();
-	    return group;
+	  room: function room(game, x, y) {
+	    return new _Room2.default(game, x, y, ROOM);
 	  },
 	
 	  enemies: function enemies(game, parent) {
@@ -966,51 +966,23 @@
 	  value: true
 	});
 	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var Room = function (_Phaser$Group) {
-	  _inherits(Room, _Phaser$Group);
+	var Room = function (_Phaser$Sprite) {
+	  _inherits(Room, _Phaser$Sprite);
 	
-	  function Room(game, parent, name) {
+	  function Room(game, x, y, name) {
 	    _classCallCheck(this, Room);
 	
-	    return _possibleConstructorReturn(this, (Room.__proto__ || Object.getPrototypeOf(Room)).call(this, game, parent, name));
+	    return _possibleConstructorReturn(this, (Room.__proto__ || Object.getPrototypeOf(Room)).call(this, game, x, y, name));
 	  }
 	
-	  _createClass(Room, [{
-	    key: "setBrickBuilder",
-	    value: function setBrickBuilder(builder) {
-	      this.brickBuilder = builder;
-	    }
-	  }, {
-	    key: "buildAll",
-	    value: function buildAll() {
-	      this.addBrick(144, 128);
-	      this.addBrick(160, 128);
-	      this.addBrick(176, 128);
-	      this.addBrick(144, 144);
-	      this.addBrick(160, 144);
-	      this.addBrick(176, 144);
-	      this.addBrick(144, 160);
-	      this.addBrick(160, 160);
-	      this.addBrick(176, 160);
-	    }
-	  }, {
-	    key: "addBrick",
-	    value: function addBrick(x, y) {
-	      var brick = this.brickBuilder(game, x, y);
-	      this.add(brick);
-	    }
-	  }]);
-	
 	  return Room;
-	}(Phaser.Group);
+	}(Phaser.Sprite);
 	
 	exports.default = Room;
 
