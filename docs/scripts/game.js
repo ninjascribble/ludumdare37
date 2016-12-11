@@ -705,6 +705,7 @@
 	    _this.animations.add('walkUp', [0, 1, 2, 3], 6, true);
 	    _this.animations.add('walkRight', [4, 5, 6, 7], 6, true);
 	    _this.animations.add('walkLeft', [4, 5, 6, 7], 6, true);
+	    _this.animations.add('vampire', [8, 9, 10, 11], 6, true);
 	
 	    _this.target = null;
 	    _this.onEnterTargetZone = null;
@@ -754,12 +755,14 @@
 	      var yDiff = 144 - this.y;
 	
 	      //If the enemy isn't next to the book then procede with movement
-	      if (Math.abs(xDiff) > 16 || Math.abs(yDiff) > 16) {
+	      if (Math.abs(xDiff) > 24 || Math.abs(yDiff) > 24) {
 	        if (randNum > 30) {
 	          this.moveToBook(xDiff, yDiff);
 	        } else {
 	          this.travel();
 	        }
+	      } else {
+	        this.animations.play('vampire');
 	      }
 	    }
 	
