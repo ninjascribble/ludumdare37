@@ -249,6 +249,12 @@
 	      }, this);
 	
 	      this.attackTimer.start();
+	
+	      this.input.keyboard.addKeyCapture(Phaser.Keyboard.LEFT);
+	      this.input.keyboard.addKeyCapture(Phaser.Keyboard.RIGHT);
+	      this.input.keyboard.addKeyCapture(Phaser.Keyboard.UP);
+	      this.input.keyboard.addKeyCapture(Phaser.Keyboard.DOWN);
+	      this.input.keyboard.addKeyCapture(Phaser.Keyboard.SPACEBAR);
 	    }
 	  }, {
 	    key: 'update',
